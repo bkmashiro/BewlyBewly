@@ -30,6 +30,19 @@ export interface MomentFilterSettingsV1 {
   rules: MomentFilterRule[]
 }
 
+export interface MomentFilterCandidate {
+  authorUid?: string
+  authorName?: string
+  content?: string
+  dynamicType?: string
+  commercialSignals?: string[]
+}
+
+export interface MomentFilterMatchResult {
+  action: 'none' | MomentRuleAction
+  matchedRuleIds: string[]
+}
+
 export interface MomentFilterValidationIssue {
   path: string
   message: string
