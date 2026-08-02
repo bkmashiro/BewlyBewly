@@ -326,7 +326,10 @@ interface MatchedFeatures {
 
 function matchedFeatures(candidate: MomentFilterCandidate, signature: PromotionSignature): MatchedFeatures {
   const content = candidate.content?.normalize('NFKC').toLowerCase() ?? ''
-  const contentDomains = extractDomains(candidate.content ?? '')
+  const contentDomains = normalizePromotionDomains([
+    ...extractDomains(candidate.content ?? ''),
+    ...(candidate.domains ?? []),
+  ])
   const candidateSignals = normalizeSignals(candidate.commercialSignals)
   return {
     keywords: signature.keywords.some(keyword => matchesKeyword(content, keyword)),
@@ -355,7 +358,7 @@ function heuristicFeatureGroups(candidate: MomentFilterCandidate): string[] {
     groups.push('disclosure')
   if (/[¥￥$€]\s*\d|\d+(?:\.\d+)?\s*[元折]|优惠[码券]|满.{0,8}减|限时(?:优惠|折扣)|专属(?:链接|优惠)|下单|购买|店铺|商品|带货|领取/u.test(content))
     groups.push('transaction')
-  if (extractDomains(content).length > 0)
+  if (extractDomains(content).length > 0 || (candidate.domains?.length ?? 0) > 0)
     groups.push('external link')
   return groups
 }

@@ -125,7 +125,8 @@ describe('promotion learning pure core', () => {
     expect(classifyPromotionCandidate({ content: 'New Product' }, state).classification)
       .toBe('none')
     expect(classifyPromotionCandidate({
-      content: 'New Product https://example.com/shop',
+      content: 'New Product',
+      domains: ['Example.com'],
     }, state).classification).toBe('confirmed')
   })
 

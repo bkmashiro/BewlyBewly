@@ -95,6 +95,20 @@ describe('moment DOM extraction', () => {
     expect(extractMomentCandidate(card).authorUid).toBe('10001')
   })
 
+  it('extracts normalized link domains without persisting full URLs', () => {
+    const card = document.createElement('article')
+    card.innerHTML = `
+      <a href="https://WWW.Example.com/campaign?token=[REDACTED]">campaign</a>
+      <a href="https://example.com/other">same host</a>
+      <a href="javascript:void(0)">ignored</a>
+    `
+
+    const candidate = extractMomentCandidate(card)
+    expect(candidate.domains).toEqual(['example.com'])
+    expect(JSON.stringify(candidate)).not.toContain('campaign')
+    expect(JSON.stringify(candidate)).not.toContain('[REDACTED]')
+  })
+
   it('recognizes a direct forwarded card but ignores unrelated nested forward elements', () => {
     const card = document.createElement('div')
     card.innerHTML = '<div class="unrelated-wrapper"><div class="forward"></div></div>'

@@ -35,6 +35,7 @@ export interface MomentFilterCandidate {
   authorName?: string
   content?: string
   dynamicType?: string
+  domains?: string[]
   commercialSignals?: string[]
 }
 

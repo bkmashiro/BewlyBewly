@@ -66,12 +66,34 @@ function extractCommercialSignals(card: Element): string[] {
     .map(([signal]) => signal)
 }
 
+function extractDomains(card: Element): string[] {
+  const domains = Array.from(card.querySelectorAll<HTMLAnchorElement>('a[href]'))
+    .flatMap((anchor) => {
+      try {
+        const url = new URL(anchor.href, 'https://t.bilibili.com')
+        if (url.protocol !== 'http:' && url.protocol !== 'https:')
+          return []
+        const hostname = url.hostname.toLowerCase().replace(/^www\./u, '')
+        if (hostname === 'bilibili.com' || hostname === 'space.bilibili.com' || hostname === 't.bilibili.com' || hostname === 'b23.tv')
+          return []
+        return [hostname]
+      }
+      catch {
+        return []
+      }
+    })
+    .filter(Boolean)
+  return Array.from(new Set(domains))
+}
+
 export function extractMomentCandidate(card: Element): MomentFilterCandidate {
+  const domains = extractDomains(card)
   return {
     authorUid: extractAuthorUid(card),
     authorName: normalizedText(card.querySelector(MOMENT_AUTHOR_SELECTOR)),
     content: extractContent(card),
     dynamicType: extractDynamicType(card),
+    ...(domains.length > 0 ? { domains } : {}),
     commercialSignals: extractCommercialSignals(card),
   }
 }
@@ -82,6 +104,7 @@ export function fingerprintMomentCandidate(candidate: MomentFilterCandidate): st
     candidate.authorName ?? '',
     candidate.content ?? '',
     candidate.dynamicType ?? '',
+    candidate.domains ?? [],
     candidate.commercialSignals ?? [],
   ])
 }
