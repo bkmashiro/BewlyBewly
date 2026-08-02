@@ -480,9 +480,9 @@ pnpm zip:firefox
 
 ### 9.4 归档
 
-- Chromium：`.output/bewly-bewly-0.41.1-chrome.zip`，16,196,550 bytes，SHA-256 `63d492a48460d8cf5ebadaab2f4035c37b86b1e694e5183d1b2ff772e56e8dcf`。
-- Firefox：`.output/bewly-bewly-0.41.1-firefox.zip`，16,196,884 bytes，SHA-256 `d4b5f1cfb96176debb121fd3a1a53f9ab5b858d24b7d273da3f7f8b4f3dd9e66`。
-- Sources：`.output/bewly-bewly-0.41.1-sources.zip`，16,132,230 bytes，SHA-256 `f600efad5763f52099558129e121eafeff323fe5c0d8b5160c6758f33bd4d493`。
+- Chromium：`.output/bewly-bewly-0.41.1-chrome.zip`，16,141,088 bytes，SHA-256 `757b1a8ed4daaa98607cb741e6b8fd6e09668c1f728b7dcb62d56a832db746e8`。
+- Firefox：`.output/bewly-bewly-0.41.1-firefox.zip`，16,141,432 bytes，SHA-256 `98b0c770c45cb5a3b04555d8630ebb9bafb4ae149e89d5451abec039e139f913`。
+- Sources：`.output/bewly-bewly-0.41.1-sources.zip`，16,079,054 bytes，SHA-256 `dcfa448bdeb7d1f6546d08d94b2099ecafabe96a2f11100c53179fbc1b2d57fd`。
 - 三个归档均通过 `unzip -tq`。
 
 ### 9.5 环境覆盖边界
