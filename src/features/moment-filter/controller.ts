@@ -1,3 +1,5 @@
+import type { MomentPromotionActionLabels } from './promotion-actions'
+import type { PromotionLearningStorage } from './promotion-storage'
 import type { MomentQuickActionLabels } from './quick-actions'
 import type {
   MomentFilterCandidate,
@@ -8,6 +10,12 @@ import type {
 } from './types'
 import { extractMomentCandidate, fingerprintMomentCandidate } from './extract'
 import { compileMomentFilter } from './matcher'
+import {
+  createMomentPromotionActionManager,
+  MOMENT_PROMOTION_BANNER_CLASS,
+  MOMENT_PROMOTION_COLLAPSED_CLASS,
+} from './promotion-actions'
+import { classifyPromotionCandidate, createEmptyPromotionLearningState } from './promotion-learning'
 import { createMomentQuickActionManager } from './quick-actions'
 import {
   MOMENT_CARD_SELECTOR,
@@ -37,6 +45,11 @@ export interface MomentFilterControllerOptions {
   quickActions?: {
     labels: MomentQuickActionLabels
     onAction: (candidate: MomentFilterCandidate, action: MomentRuleAction) => Promise<void>
+  }
+  promotion?: {
+    storage: PromotionLearningStorage
+    labels: MomentPromotionActionLabels
+    onLearn: (candidate: MomentFilterCandidate, keywords: string[]) => Promise<void>
   }
 }
 
@@ -85,12 +98,16 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
   const quickActionManager = options.quickActions
     ? createMomentQuickActionManager(options.quickActions.labels, options.quickActions.onAction)
     : undefined
+  const promotionActionManager = options.promotion
+    ? createMomentPromotionActionManager(options.promotion.labels, options.promotion.onLearn)
+    : undefined
 
   let disposed = false
   let active = false
   let batchScheduled = false
   let diagnosedMissingList = false
   let settings: MomentFilterSettingsV1 | undefined
+  let promotionState = createEmptyPromotionLearningState()
   let match = (_candidate: ReturnType<typeof extractMomentCandidate>): MomentFilterMatchResult => ({
     action: 'none',
     matchedRuleIds: [],
@@ -139,7 +156,20 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
       seenFingerprints.set(card, fingerprint)
       quickActionManager?.ensure(card, candidate, fingerprint)
       evaluated += 1
-      applyResult(card, match(candidate))
+      const ruleResult = match(candidate)
+      if (ruleResult.action !== 'none') {
+        promotionActionManager?.remove(card)
+        applyResult(card, ruleResult)
+        continue
+      }
+      restoreCard(card)
+      promotionActionManager?.ensure(
+        card,
+        candidate,
+        fingerprint,
+        classifyPromotionCandidate(candidate, promotionState),
+        options.promotion?.onLearn,
+      )
     }
 
     if (pendingCards.size > 0)
@@ -231,6 +261,33 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
       styleElement.dataset.bewlyMomentFilter = 'true'
       styleElement.textContent = `
         .${MOMENT_FILTER_HIDDEN_CLASS} { display: none !important; }
+        .${MOMENT_PROMOTION_COLLAPSED_CLASS} > :not(.${MOMENT_PROMOTION_BANNER_CLASS}) {
+          display: none !important;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} {
+          display: flex; padding: 10px 12px; gap: 8px; align-items: center; flex-wrap: wrap;
+          border: 1px solid rgba(127, 127, 127, 0.24); border-radius: 8px;
+          color: var(--text1, #18191c); background: var(--bg1, #fff); font-size: 13px;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-status] { flex: 1 1 220px; }
+        .${MOMENT_PROMOTION_BANNER_CLASS} button {
+          border: 0; border-radius: 6px; padding: 6px 9px; color: inherit;
+          background: rgba(127, 127, 127, 0.14); cursor: pointer; font: inherit;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} button:focus-visible,
+        .${MOMENT_PROMOTION_BANNER_CLASS} input:focus-visible {
+          outline: 2px solid currentColor; outline-offset: 2px;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-panel] {
+          display: flex; flex: 1 0 100%; gap: 8px; align-items: center; flex-wrap: wrap;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-keywords] {
+          display: flex; flex: 1 1 240px; gap: 6px; flex-wrap: wrap;
+        }
+        .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-keywords] label {
+          display: inline-flex; padding: 4px 7px; gap: 4px; align-items: center;
+          border-radius: 999px; background: rgba(127, 127, 127, 0.1);
+        }
         .bewly-moment-filter-quick-action {
           position: relative; display: inline-flex; margin-inline-start: 8px; vertical-align: middle;
         }
@@ -280,6 +337,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
     batchScheduled = false
     seenFingerprints = new WeakMap<Element, string>()
     quickActionManager?.cleanup()
+    promotionActionManager?.cleanup()
     restoreAllCards()
     styleElement?.remove()
     styleElement = undefined
@@ -324,9 +382,23 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
   document.addEventListener('DOMContentLoaded', handleDomReady)
 
   const unsubscribe = storage.subscribe(result => applySettings(result.value))
+  const unsubscribePromotion = options.promotion?.storage.subscribe((result) => {
+    promotionState = result.value
+    seenFingerprints = new WeakMap<Element, string>()
+    if (active)
+      feedRoot?.querySelectorAll(MOMENT_CARD_SELECTOR).forEach(queueCard)
+  })
   void storage.load().then((result) => {
     if (!disposed)
       applySettings(result.value)
+  })
+  void options.promotion?.storage.load().then((result) => {
+    if (disposed)
+      return
+    promotionState = result.value
+    seenFingerprints = new WeakMap<Element, string>()
+    if (active)
+      feedRoot?.querySelectorAll(MOMENT_CARD_SELECTOR).forEach(queueCard)
   })
 
   return {
@@ -338,6 +410,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
         return
       disposed = true
       unsubscribe()
+      unsubscribePromotion?.()
       deactivate()
       window.removeEventListener(HISTORY_CHANGE_EVENT, handleLocationChange)
       window.removeEventListener('popstate', handleLocationChange)

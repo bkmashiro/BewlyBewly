@@ -1,3 +1,4 @@
+import type { PromotionLearningStorage } from '~/features/moment-filter/promotion-storage'
 import type {
   MomentFilterLoadResult,
   MomentFilterSettingsV1,
@@ -9,6 +10,8 @@ import {
   createMomentFilterController,
   MOMENT_FILTERED_ATTRIBUTE,
 } from '~/features/moment-filter/controller'
+import { MOMENT_PROMOTION_COLLAPSED_CLASS } from '~/features/moment-filter/promotion-actions'
+import { createEmptyPromotionLearningState } from '~/features/moment-filter/promotion-learning'
 
 function settings(enabled = true): MomentFilterSettingsV1 {
   return {
@@ -51,6 +54,15 @@ function createStorage(initial = settings()) {
   }
 }
 
+function createPromotionStorage(): PromotionLearningStorage {
+  const value = createEmptyPromotionLearningState()
+  return {
+    load: vi.fn(async () => ({ status: 'default' as const, value, issues: [] })),
+    save: vi.fn(async input => input),
+    subscribe: vi.fn(() => () => {}),
+  }
+}
+
 function card(uid = '10001', text = 'Fixture text'): HTMLElement {
   const element = document.createElement('div')
   element.className = 'bili-dyn-list__item'
@@ -81,6 +93,86 @@ afterEach(() => {
 })
 
 describe('moment filter controller', () => {
+  it('collapses explainable promotions without deleting host content and restores them on cleanup', async () => {
+    const promotionCard = card('20002', '品牌合作 新品上线')
+    promotionCard.insertAdjacentHTML('beforeend', '<div class="bili-dyn-card-goods">Fixture goods</div>')
+    mountFeed([promotionCard])
+    const { storage } = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage,
+      getHref: () => 'https://t.bilibili.com/',
+      promotion: {
+        storage: createPromotionStorage(),
+        labels: {
+          suspected: '疑似推广',
+          confirmed: '已确认推广',
+          show: '显示本条',
+          hide: '收起本条',
+          learn: '加入学习库',
+          confirm: '确认学习',
+          cancel: '取消',
+          noKeywords: '没有关键词',
+          error: '保存失败',
+        },
+        onLearn: vi.fn(),
+      },
+    })
+    cleanups.push(controller.cleanup)
+
+    await flushMutations()
+    expect(promotionCard.classList.contains(MOMENT_PROMOTION_COLLAPSED_CLASS)).toBe(true)
+    expect(promotionCard.querySelector('.bili-dyn-card-goods')).toBeTruthy()
+    expect(promotionCard.querySelector('[data-promotion-status]')?.textContent).toContain('已确认推广')
+
+    controller.cleanup()
+    expect(promotionCard.classList.contains(MOMENT_PROMOTION_COLLAPSED_CLASS)).toBe(false)
+    expect(promotionCard.querySelector('[data-promotion-status]')).toBeNull()
+  })
+
+  it('keeps allow rules ahead of promotion collapse', async () => {
+    const promotionCard = card('20002', '品牌合作 限时优惠')
+    promotionCard.insertAdjacentHTML('beforeend', '<div class="bili-dyn-card-goods">Fixture goods</div>')
+    mountFeed([promotionCard])
+    const allowed = settings()
+    allowed.rules = [{
+      id: 'allow-author',
+      enabled: true,
+      action: 'allow',
+      field: 'authorUid',
+      operator: 'equals',
+      value: '20002',
+      createdAt: 2,
+    }]
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage: createStorage(allowed).storage,
+      getHref: () => 'https://t.bilibili.com/',
+      promotion: {
+        storage: createPromotionStorage(),
+        labels: {
+          suspected: '疑似推广',
+          confirmed: '已确认推广',
+          show: '显示本条',
+          hide: '收起本条',
+          learn: '加入学习库',
+          confirm: '确认学习',
+          cancel: '取消',
+          noKeywords: '没有关键词',
+          error: '保存失败',
+        },
+        onLearn: vi.fn(),
+      },
+    })
+    cleanups.push(controller.cleanup)
+
+    await flushMutations()
+    expect(promotionCard.classList.contains(MOMENT_PROMOTION_COLLAPSED_CLASS)).toBe(false)
+    expect(promotionCard.querySelector('[data-promotion-status]')).toBeNull()
+  })
+
   it('scans existing cards, filters inserted cards, and skips unchanged fingerprints', async () => {
     const first = card()
     const list = mountFeed([first])
