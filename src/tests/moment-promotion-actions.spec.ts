@@ -113,6 +113,7 @@ describe('moment promotion actions DOM manager', () => {
     expect(learn).toBeTruthy()
     learn.click()
     const panel = card.querySelector<HTMLElement>('[data-promotion-panel]')!
+    expect(panel.querySelector('[data-promotion-keywords]')).toBeTruthy()
     const checkboxes = [...panel.querySelectorAll<HTMLInputElement>('input[type="checkbox"]')]
     expect(checkboxes.length).toBeGreaterThan(0)
     expect(checkboxes.some(input => input.checked)).toBe(false)

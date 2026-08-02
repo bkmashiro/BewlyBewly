@@ -225,6 +225,7 @@ export function createMomentPromotionActionManager(
       panel.append(panelTitle)
 
       const chipList = ownerDocument.createElement('div')
+      chipList.dataset.promotionKeywords = 'true'
       chipList.setAttribute('role', 'group')
       chipList.setAttribute('aria-label', labels.learn)
       checkboxes = keywords.map((keyword) => {

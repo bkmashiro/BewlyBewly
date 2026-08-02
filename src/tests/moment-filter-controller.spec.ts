@@ -10,7 +10,10 @@ import {
   createMomentFilterController,
   MOMENT_FILTERED_ATTRIBUTE,
 } from '~/features/moment-filter/controller'
-import { MOMENT_PROMOTION_COLLAPSED_CLASS } from '~/features/moment-filter/promotion-actions'
+import {
+  MOMENT_PROMOTION_COLLAPSED_CLASS,
+  MOMENT_PROMOTION_PANEL_CLASS,
+} from '~/features/moment-filter/promotion-actions'
 import { createEmptyPromotionLearningState } from '~/features/moment-filter/promotion-learning'
 
 function settings(enabled = true): MomentFilterSettingsV1 {
@@ -125,6 +128,8 @@ describe('moment filter controller', () => {
     expect(promotionCard.classList.contains(MOMENT_PROMOTION_COLLAPSED_CLASS)).toBe(true)
     expect(promotionCard.querySelector('.bili-dyn-card-goods')).toBeTruthy()
     expect(promotionCard.querySelector('[data-promotion-status]')?.textContent).toContain('已确认推广')
+    expect(document.querySelector<HTMLStyleElement>('style[data-bewly-moment-filter]')?.textContent)
+      .toContain(`.${MOMENT_PROMOTION_PANEL_CLASS}[hidden]`)
 
     controller.cleanup()
     expect(promotionCard.classList.contains(MOMENT_PROMOTION_COLLAPSED_CLASS)).toBe(false)

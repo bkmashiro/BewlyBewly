@@ -14,6 +14,7 @@ import {
   createMomentPromotionActionManager,
   MOMENT_PROMOTION_BANNER_CLASS,
   MOMENT_PROMOTION_COLLAPSED_CLASS,
+  MOMENT_PROMOTION_PANEL_CLASS,
 } from './promotion-actions'
 import { classifyPromotionCandidate, createEmptyPromotionLearningState } from './promotion-learning'
 import { createMomentQuickActionManager } from './quick-actions'
@@ -281,6 +282,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
         .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-panel] {
           display: flex; flex: 1 0 100%; gap: 8px; align-items: center; flex-wrap: wrap;
         }
+        .${MOMENT_PROMOTION_PANEL_CLASS}[hidden] { display: none !important; }
         .${MOMENT_PROMOTION_BANNER_CLASS} [data-promotion-keywords] {
           display: flex; flex: 1 1 240px; gap: 6px; flex-wrap: wrap;
         }
