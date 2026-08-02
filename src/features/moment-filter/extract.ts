@@ -2,8 +2,10 @@ import type { MomentFilterCandidate } from './types'
 import {
   MOMENT_AUTHOR_LINK_SELECTOR,
   MOMENT_AUTHOR_SELECTOR,
+  MOMENT_AUTHOR_UID_FALLBACK_SELECTOR,
   MOMENT_COMMERCIAL_SIGNAL_SELECTORS,
   MOMENT_CONTENT_SELECTORS,
+  MOMENT_FORWARD_SELECTOR,
 } from './selectors'
 
 function normalizedText(element: Element | null): string | undefined {
@@ -13,36 +15,48 @@ function normalizedText(element: Element | null): string | undefined {
 
 function extractAuthorUid(card: Element): string | undefined {
   const href = card.querySelector<HTMLAnchorElement>(MOMENT_AUTHOR_LINK_SELECTOR)?.href
-  if (!href)
-    return undefined
+  if (href) {
+    try {
+      const match = new URL(href, 'https://t.bilibili.com').pathname.match(/^\/(\d+)(?:\/|$)/)
+      if (match?.[1])
+        return match[1]
+    }
+    catch {
+      // Fall through to the data-mid marker used by the current page.
+    }
+  }
 
-  try {
-    const match = new URL(href, 'https://t.bilibili.com').pathname.match(/^\/(\d+)(?:\/|$)/)
-    return match?.[1]
-  }
-  catch {
-    return undefined
-  }
+  const fallback = card.querySelector(MOMENT_AUTHOR_UID_FALLBACK_SELECTOR)?.getAttribute('data-mid')?.trim()
+  return fallback && /^\d+$/.test(fallback) ? fallback : undefined
 }
 
 function extractContent(card: Element): string | undefined {
-  const parts = MOMENT_CONTENT_SELECTORS
+  const [origSelector, ...structuredSelectors] = MOMENT_CONTENT_SELECTORS
+  const origParts = Array.from(card.querySelectorAll(origSelector))
+    .map((element) => {
+      const clone = element.cloneNode(true) as Element
+      if (structuredSelectors.length > 0)
+        clone.querySelectorAll(structuredSelectors.join(',')).forEach(child => child.remove())
+      return normalizedText(clone)
+    })
+  const structuredParts = structuredSelectors
     .flatMap(selector => Array.from(card.querySelectorAll(selector)))
     .map(normalizedText)
+  const parts = [...origParts, ...structuredParts]
     .filter((value): value is string => value !== undefined)
   const uniqueParts = Array.from(new Set(parts))
   return uniqueParts.length > 0 ? uniqueParts.join('\n') : undefined
 }
 
 function extractDynamicType(card: Element): string | undefined {
+  if (card.querySelector(MOMENT_FORWARD_SELECTOR))
+    return 'forward'
   if (card.querySelector('.bili-dyn-card-video__title'))
     return 'video'
   if (card.querySelector('.bili-dyn-card-link-common__detail__title'))
     return 'link'
   if (card.querySelector('.dyn-card-opus'))
     return 'opus'
-  if (card.querySelector('.bili-dyn-forward, .bili-dyn-item__orig'))
-    return 'forward'
   return undefined
 }
 

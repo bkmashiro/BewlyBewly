@@ -29,6 +29,36 @@ type FuncMap = { [key in FilterType]: {
 
 type KeyPath = Array<string>[]
 
+interface FilterRule {
+  keyword: string
+}
+
+interface CompiledKeywordFilters {
+  strings: string[]
+  regexps: RegExp[]
+}
+
+function compileKeywordFilters(rules: FilterRule[]): CompiledKeywordFilters {
+  const strings: string[] = []
+  const regexps: RegExp[] = []
+
+  rules.forEach((item) => {
+    if (item.keyword.startsWith('/') && item.keyword.endsWith('/')) {
+      try {
+        regexps.push(new RegExp(item.keyword.slice(1, -1), 'i'))
+      }
+      catch {
+        // Invalid regex rules are ignored so they cannot disable the filter.
+      }
+    }
+    else {
+      strings.push(`${item.keyword}`.toUpperCase())
+    }
+  })
+
+  return { strings, regexps }
+}
+
 export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], keyList: KeyPath) {
   function filterOutVerticalVideos(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
@@ -75,17 +105,7 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
   }
 
   // #region filter by title
-  const filterByTitleStringValues: string[] = []
-  const filterByTitleRegExpValues: RegExp[] = []
-
-  settings.value.filterByTitle.forEach((item) => {
-    if (item.keyword.startsWith('/') && item.keyword.endsWith('/')) {
-      filterByTitleRegExpValues.push(new RegExp(item.keyword.slice(1, -1), 'i'))
-    }
-    else {
-      filterByTitleStringValues.push(`${item.keyword}`.toUpperCase())
-    }
-  })
+  const filterByTitleValues = computed(() => compileKeywordFilters(settings.value.filterByTitle))
 
   /**
    * Compares the title of an item with the given key path.
@@ -96,23 +116,13 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
   function compareTitle(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
 
-    return !(filterByTitleStringValues.some(keyword => `${value}`.toUpperCase().includes(keyword))
-      || filterByTitleRegExpValues.some(regex => regex.test(String(value))))
+    return !(filterByTitleValues.value.strings.some(keyword => `${value}`.toUpperCase().includes(keyword))
+      || filterByTitleValues.value.regexps.some(regex => regex.test(String(value))))
   }
   // #endregion
 
   // #region filter by user
-  const filterByUserStringValues: string[] = []
-  const filterByUserRegExpValues: RegExp[] = []
-
-  settings.value.filterByUser.forEach((item) => {
-    if (item.keyword.startsWith('/') && item.keyword.endsWith('/')) {
-      filterByUserRegExpValues.push(new RegExp(item.keyword.slice(1, -1), 'i'))
-    }
-    else {
-      filterByUserStringValues.push(`${item.keyword}`.toUpperCase())
-    }
-  })
+  const filterByUserValues = computed(() => compileKeywordFilters(settings.value.filterByUser))
 
   /**
    * Compares a given item with a key path and determines if it does not meets the filter criteria.
@@ -123,8 +133,8 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
   function compareUser(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
 
-    return !(filterByUserStringValues.includes(`${value}`.toUpperCase())
-      || filterByUserRegExpValues.some(regex => regex.test(String(value))))
+    return !(filterByUserValues.value.strings.includes(`${value}`.toUpperCase())
+      || filterByUserValues.value.regexps.some(regex => regex.test(String(value))))
   }
   // #endregion
 
