@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { onKeyStroke } from '@vueuse/core'
 import type { Ref } from 'vue'
+import type { GridLayoutType } from '~/logic'
 
+import type { AppForYouResult, Item as AppVideoItem } from '~/models/video/appForYou'
+import type { forYouResult, Item as VideoItem } from '~/models/video/forYou'
+import { onKeyStroke } from '@vueuse/core'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { FilterType, useFilter } from '~/composables/useFilter'
 import { LanguageType } from '~/enums/appEnums'
-import type { GridLayoutType } from '~/logic'
 import { accessKey, settings } from '~/logic'
-import type { AppForYouResult, Item as AppVideoItem } from '~/models/video/appForYou'
 import { Type as ThreePointV2Type } from '~/models/video/appForYou'
-import type { forYouResult, Item as VideoItem } from '~/models/video/forYou'
 import api from '~/utils/api'
 import { TVAppKey } from '~/utils/authProvider'
 import { isVerticalVideo } from '~/utils/uriParse'
@@ -157,7 +157,7 @@ function initPageAction() {
 async function getRecommendVideos() {
   try {
     let i = 0
-    if (!filterFunc.value || (videoList.value.length < PAGE_SIZE && filterFunc.value)) {
+    if (!filterFunc.value || videoList.value.length < PAGE_SIZE) {
       const pendingVideos: VideoElement[] = Array.from({
         length: videoList.value.length < PAGE_SIZE ? PAGE_SIZE - videoList.value.length : PAGE_SIZE,
       }, () => ({
@@ -237,7 +237,7 @@ async function getRecommendVideos() {
 async function getAppRecommendVideos() {
   try {
     let i = 0
-    if (!appFilterFunc.value || (appVideoList.value.length < PAGE_SIZE && appFilterFunc.value)) {
+    if (!appFilterFunc.value || appVideoList.value.length < PAGE_SIZE) {
       const pendingVideos: AppVideoElement[] = Array.from({
         length: appVideoList.value.length < PAGE_SIZE ? PAGE_SIZE - appVideoList.value.length : PAGE_SIZE,
       }, () => ({

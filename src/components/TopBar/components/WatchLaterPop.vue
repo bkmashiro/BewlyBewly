@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import type { List as VideoItem, WatchLaterResult } from '~/models/video/watchLater'
 import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
 import Progress from '~/components/Progress.vue'
-import type { List as VideoItem, WatchLaterResult } from '~/models/video/watchLater'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
 import { getCSRF, removeHttpFromUrl } from '~/utils/main'

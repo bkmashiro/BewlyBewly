@@ -4,19 +4,15 @@
 
 import type Browser from 'webextension-polyfill'
 
-type FetchAfterHandler = ((data: Response) => Promise<any>) | ((data: any) => any)
+type FetchAfterHandler = (data: unknown) => unknown | Promise<unknown>
 
-function toJsonHandler(data: Response): Promise<any> {
+async function toJsonHandler(data: unknown): Promise<unknown> {
+  if (!(data instanceof Response))
+    throw new TypeError('Expected a fetch Response before JSON parsing')
   return data.json()
 }
-function toData(data: Promise<any>): Promise<any> {
+function toData(data: unknown): unknown {
   return data
-}
-
-// if need sendResponse, use this
-// return a FetchAfterHandler function
-function sendResponseHandler(sendResponse: Function) {
-  return (data: any) => sendResponse(data)
 }
 
 // 定义后处理流
@@ -26,13 +22,20 @@ const AHS: {
   S: FetchAfterHandler[]
 } = {
   J_D: [toJsonHandler, toData],
-  J_S: [toJsonHandler, sendResponseHandler],
-  S: [sendResponseHandler],
+  J_S: [toJsonHandler, toData],
+  S: [toData],
 }
 
 interface Message {
   contentScriptQuery: string
   [key: string]: any
+}
+
+function isMessage(value: unknown): value is Message {
+  return typeof value === 'object'
+    && value !== null
+    && 'contentScriptQuery' in value
+    && typeof value.contentScriptQuery === 'string'
 }
 
 interface _FETCH {
@@ -49,36 +52,43 @@ interface API {
   params?: {
     [key: string]: any
   }
-  afterHandle: ((response: Response) => Response | Promise<Response>)[]
+  afterHandle: FetchAfterHandler[]
 }
 // 重载API 可以为函数
-type APIFunction = (message: Message, sender?: any, sendResponse?: Function) => any
+type APIFunction = (
+  message: Message,
+  sender?: Browser.Runtime.MessageSender,
+) => unknown
 export type APIType = API | APIFunction
 interface APIMAP {
   [key: string]: APIType
 }
 // 工厂函数API_LISTENER_FACTORY
 function apiListenerFactory(API_MAP: APIMAP) {
-  return async (message: Message, sender?: Browser.Runtime.MessageSender, sendResponse?: Function) => {
+  return async (value: unknown, sender: Browser.Runtime.MessageSender) => {
+    if (!isMessage(value))
+      return console.error('Received an invalid runtime message')
+
+    const message = value
     const contentScriptQuery = message.contentScriptQuery
     // 检测是否有contentScriptQuery
     if (!contentScriptQuery || !API_MAP[contentScriptQuery])
       return console.error(`Cannot find this contentScriptQuery: ${contentScriptQuery}`)
-    if (API_MAP[contentScriptQuery] instanceof Function)
-      return (API_MAP[contentScriptQuery] as APIFunction)(message, sender, sendResponse)
+    if (typeof API_MAP[contentScriptQuery] === 'function')
+      return (API_MAP[contentScriptQuery] as APIFunction)(message, sender)
 
     const api = API_MAP[contentScriptQuery] as API
 
     if (import.meta.env.BROWSER === 'firefox' && sender && sender.tab && sender.tab.cookieStoreId) {
       const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId })
-      return doRequest(message, api, sendResponse, cookies)
+      return doRequest(message, api, cookies)
     }
 
-    return doRequest(message, api, sendResponse)
+    return doRequest(message, api)
   }
 }
 
-function doRequest(message: Message, api: API, sendResponse?: Function, cookies?: Browser.Cookies.Cookie[]) {
+function doRequest(message: Message, api: API, cookies?: Browser.Cookies.Cookie[]) {
   try {
     let { contentScriptQuery, ...rest } = message
     // rest above two part body or params
@@ -119,15 +129,11 @@ function doRequest(message: Message, api: API, sendResponse?: Function, cookies?
     const fetchOpt = { method, headers }
     !isGET && Object.assign(fetchOpt, { body: targetBody })
     // fetch and after handle
-    let baseFunc = fetch(url, {
+    let baseFunc: Promise<unknown> = fetch(url, {
       ...fetchOpt,
     })
     afterHandle.forEach((func) => {
-      if (func.name === sendResponseHandler.name && sendResponse)
-        // sendResponseHandler 是一个特殊的后处理函数，需要传入sendResponse
-        baseFunc = baseFunc.then(sendResponseHandler(sendResponse))
-      else
-        baseFunc = baseFunc.then(func)
+      baseFunc = baseFunc.then(func)
     })
     baseFunc.catch(console.error)
     return baseFunc
@@ -145,7 +151,6 @@ export {
   type APIMAP,
   type FetchAfterHandler,
   type Message,
-  sendResponseHandler,
   toData,
   toJsonHandler,
 }

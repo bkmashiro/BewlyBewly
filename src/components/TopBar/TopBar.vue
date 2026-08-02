@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onClickOutside, onKeyStroke, useMouseInElement } from '@vueuse/core'
 import type { Ref, UnwrapNestedRefs } from 'vue'
+import type { UnReadDm, UnReadMessage, UserInfo } from './types'
 
+import { onClickOutside, onKeyStroke, useMouseInElement } from '@vueuse/core'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { useDark } from '~/composables/useDark'
 import { useDelayedHover } from '~/composables/useDelayedHover'
@@ -11,8 +12,8 @@ import { settings } from '~/logic'
 import api from '~/utils/api'
 import { getUserID, isHomePage, isInIframe } from '~/utils/main'
 import emitter from '~/utils/mitt'
-import { createTransformer } from '~/utils/transformer'
 
+import { createTransformer } from '~/utils/transformer'
 import BewlyOrBiliPageSwitcher from './components/BewlyOrBiliPageSwitcher.vue'
 import ChannelsPop from './components/ChannelsPop.vue'
 import FavoritesPop from './components/FavoritesPop.vue'
@@ -25,17 +26,6 @@ import UploadPop from './components/UploadPop.vue'
 import UserPanelPop from './components/UserPanelPop.vue'
 import WatchLaterPop from './components/WatchLaterPop.vue'
 import { updateInterval } from './notify'
-import type { UnReadDm, UnReadMessage, UserInfo } from './types'
-
-// import { useTopBarStore } from '~/stores/topBarStore'
-
-// const popups = { NotificationsPop, MomentsPop, FavoritesPop, HistoryPop }
-
-// const topBarStore = useTopBarStore()
-
-// const topBarItems = computed(() => {
-//   return topBarStore.topBarItems
-// })
 
 const { activatedPage, scrollbarRef, reachTop } = useBewlyApp()
 const { isDark } = useDark()

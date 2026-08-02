@@ -1,20 +1,20 @@
-import '~/styles'
-import 'uno.css'
-
-import type { App as VueApp, EffectScope } from 'vue'
+import type { EffectScope, App as VueApp } from 'vue'
 import { createApp, effectScope } from 'vue'
 
 import { useDark } from '~/composables/useDark'
 import { BEWLY_MOUNTED } from '~/constants/globalEvents'
+
 import { settings } from '~/logic'
 import { setupApp } from '~/logic/common-setup'
 import RESET_BEWLY_CSS from '~/styles/reset.css?raw'
 import { runWhenIdle } from '~/utils/lazyLoad'
 import { compareVersions, injectCSS, isHomePage, isInIframe, isNotificationPage, isVideoOrBangumiPage } from '~/utils/main'
 import { SVG_ICONS } from '~/utils/svgIcons'
-
 import { version } from '../../package.json'
 import App from './views/App.vue'
+
+import '~/styles'
+import 'uno.css'
 
 const isFirefox: boolean = /Firefox/i.test(navigator.userAgent)
 

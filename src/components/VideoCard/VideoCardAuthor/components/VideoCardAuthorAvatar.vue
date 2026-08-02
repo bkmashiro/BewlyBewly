@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { removeHttpFromUrl } from '~/utils/main'
-
 import type { Author } from '../../types'
+
+import { removeHttpFromUrl } from '~/utils/main'
 import { getAuthorJumpUrl } from '../../utils'
 
 const props = withDefaults(defineProps<{

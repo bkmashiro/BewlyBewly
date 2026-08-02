@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useDateFormat } from '@vueuse/core'
 import type { Ref } from 'vue'
-import { useI18n } from 'vue-i18n'
+import type { List as HistoryItem, HistoryResult } from '~/models/history/history'
+import { useDateFormat } from '@vueuse/core'
 
+import { useI18n } from 'vue-i18n'
 import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
 import Progress from '~/components/Progress.vue'
-import type { HistoryResult, List as HistoryItem } from '~/models/history/history'
 import { Business } from '~/models/history/history'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'

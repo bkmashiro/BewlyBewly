@@ -1,10 +1,10 @@
 <script setup lang="ts">
+import type { List as VideoItem, WatchLaterResult } from '~/models/video/watchLater'
 import { useDateFormat } from '@vueuse/core'
-import { useI18n } from 'vue-i18n'
 
+import { useI18n } from 'vue-i18n'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { settings } from '~/logic'
-import type { List as VideoItem, WatchLaterResult } from '~/models/video/watchLater'
 import { useMainStore } from '~/stores/mainStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'

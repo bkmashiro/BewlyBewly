@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-
-import { useBewlyApp } from '~/composables/useAppProvider'
-import type { GridLayoutType } from '~/logic'
-import { settings } from '~/logic'
-import type { List as RankingVideoItem, RankingResult } from '~/models/video/ranking'
-import type { List as RankingPgcItem, RankingPgcResult } from '~/models/video/rankingPgc'
-import api from '~/utils/api'
-
 import type { RankingType } from '../types'
+
+import type { GridLayoutType } from '~/logic'
+import type { RankingResult, List as RankingVideoItem } from '~/models/video/ranking'
+import type { List as RankingPgcItem, RankingPgcResult } from '~/models/video/rankingPgc'
+import { useI18n } from 'vue-i18n'
+import { useBewlyApp } from '~/composables/useAppProvider'
+import { settings } from '~/logic'
+
+import api from '~/utils/api'
 
 const props = defineProps<{
   gridLayout: GridLayoutType

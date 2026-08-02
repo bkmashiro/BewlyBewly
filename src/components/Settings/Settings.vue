@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useEventListener } from '@vueuse/core'
-import { useI18n } from 'vue-i18n'
-
-import { settings } from '~/logic'
-import { createTransformer } from '~/utils/transformer'
-
 import type { MenuItem } from './types'
+import { useEventListener } from '@vueuse/core'
+
+import { useI18n } from 'vue-i18n'
+import { settings } from '~/logic'
+
+import { createTransformer } from '~/utils/transformer'
 import { MenuType } from './types'
 
 const emit = defineEmits(['close'])

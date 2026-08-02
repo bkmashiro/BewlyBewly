@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import type { List as HistoryItem, HistoryResult } from '~/models/history/history'
+import type { List as HistorySearchItem, HistorySearchResult } from '~/models/video/historySearch'
+
 import { useDateFormat } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
-
 import { useBewlyApp } from '~/composables/useAppProvider'
-import type { HistoryResult, List as HistoryItem } from '~/models/history/history'
 import { Business } from '~/models/history/history'
-import type { HistorySearchResult, List as HistorySearchItem } from '~/models/video/historySearch'
 import { useMainStore } from '~/stores/mainStore'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
@@ -83,7 +83,8 @@ function getHistoryList() {
           getHistoryList()
         }
       }
-    }).finally(() => {
+    })
+    .finally(() => {
       isLoading.value = false
     })
 }
@@ -108,7 +109,8 @@ function searchHistoryList() {
 
         noMoreContent.value = false
       }
-    }).finally(() => {
+    })
+    .finally(() => {
       isLoading.value = false
     })
 }

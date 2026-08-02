@@ -1,8 +1,8 @@
-import { access, readFile } from 'node:fs/promises'
-import { resolve } from 'node:path'
-
-import { describe, expect, it } from 'vitest'
 import type { Manifest } from 'webextension-polyfill'
+import { access, readFile } from 'node:fs/promises'
+
+import { resolve } from 'node:path'
+import { describe, expect, it } from 'vitest'
 
 import chromiumContract from '../../tests/fixtures/manifest/chromium.json'
 import firefoxContract from '../../tests/fixtures/manifest/firefox.json'

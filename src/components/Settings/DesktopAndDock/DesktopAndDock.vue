@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { useI18n } from 'vue-i18n'
-import draggable from 'vuedraggable'
-
-import { settings } from '~/logic'
 import type { DockItem } from '~/stores/mainStore'
+import { useI18n } from 'vue-i18n'
+
+import draggable from 'vuedraggable'
+import { settings } from '~/logic'
 import { useMainStore } from '~/stores/mainStore'
 
 import SettingsItem from '../components/SettingsItem.vue'

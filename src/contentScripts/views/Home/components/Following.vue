@@ -2,11 +2,11 @@
 import type { Ref } from 'vue'
 
 import type { Author } from '~/components/VideoCard/types'
-import { useBewlyApp } from '~/composables/useAppProvider'
 import type { GridLayoutType } from '~/logic'
-import { settings } from '~/logic'
-import type { FollowingLiveResult, List as FollowingLiveItem } from '~/models/live/getFollowingLiveList'
+import type { List as FollowingLiveItem, FollowingLiveResult } from '~/models/live/getFollowingLiveList'
 import type { DataItem as MomentItem, MomentResult } from '~/models/moment/moment'
+import { useBewlyApp } from '~/composables/useAppProvider'
+import { settings } from '~/logic'
 import api from '~/utils/api'
 
 // https://github.com/starknt/BewlyBewly/blob/fad999c2e482095dc3840bb291af53d15ff44130/src/contentScripts/views/Home/components/ForYou.vue#L16

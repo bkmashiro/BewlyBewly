@@ -1,4 +1,3 @@
-// 由于 sendResponse 复杂, 所以使用自定义的函数
 import type { APIMAP } from '../../utils'
 import { AHS } from '../../utils'
 

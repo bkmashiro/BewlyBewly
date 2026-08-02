@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { CSSProperties } from 'vue'
-import { useI18n } from 'vue-i18n'
+import type { Video } from '../types'
 
+import { useI18n } from 'vue-i18n'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { Type as ThreePointV2Type } from '~/models/video/appForYou'
 import { openLinkToNewTab } from '~/utils/main'
-import { openLinkInBackground } from '~/utils/tabs'
 
-import type { Video } from '../types'
+import { openLinkInBackground } from '~/utils/tabs'
 import DislikeDialog from './components/DislikeDialog.vue'
 
 const props = defineProps<{

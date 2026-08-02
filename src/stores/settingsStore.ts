@@ -1,6 +1,6 @@
-import { defineStore } from 'pinia'
-
 import type { AppPage } from '~/enums/appEnums'
+
+import { defineStore } from 'pinia'
 import { settings } from '~/logic'
 
 export interface DockItemConfig {

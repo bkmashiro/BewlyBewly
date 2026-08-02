@@ -1,7 +1,13 @@
 import { settings } from '~/logic'
 import { isVerticalVideo } from '~/utils/uriParse'
 
-const get = (obj: any, path: string[]) => path.reduce((acc, part) => acc && acc[part], obj)
+function get(obj: unknown, path: string[]): unknown {
+  return path.reduce<unknown>((value, part) => {
+    if (typeof value !== 'object' || value === null)
+      return undefined
+    return Reflect.get(value, part)
+  }, obj)
+}
 
 export enum FilterType {
   filterOutVerticalVideos,
@@ -12,8 +18,11 @@ export enum FilterType {
   user,
 }
 
+type FilterValue = number | string | undefined
+type FilterFunction = (item: object, keyPath: string[], filterValue: FilterValue) => boolean
+
 type FuncMap = { [key in FilterType]: {
-  func: Function
+  func: FilterFunction
   enabledKey: string
   valueKey: string
 } }
@@ -21,9 +30,9 @@ type FuncMap = { [key in FilterType]: {
 type KeyPath = Array<string>[]
 
 export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], keyList: KeyPath) {
-  function filterOutVerticalVideos(item: any, keyPath: string[], _filterValue: number) {
+  function filterOutVerticalVideos(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
-    return !isVerticalVideo(value)
+    return typeof value !== 'string' || !isVerticalVideo(value)
   }
 
   /**
@@ -35,8 +44,10 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
    * @param filterValue - The filter value to compare with.
    * @returns `true` if the number value is greater than the filter value, `false` otherwise.
    */
-  function compareNumber(item: any, keyPath: string[], filterValue: number) {
-    return get(item, keyPath) > filterValue
+  function compareNumber(item: object, keyPath: string[], filterValue: FilterValue) {
+    const numericValue = Number(get(item, keyPath))
+    const numericFilterValue = Number(filterValue)
+    return !Number.isNaN(numericValue) && !Number.isNaN(numericFilterValue) && numericValue > numericFilterValue
   }
 
   /**
@@ -46,17 +57,21 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
    * @param filterValue - The value to compare against.
    * @returns `true` if the value is greater than the filter value, `false` otherwise.
    */
-  function compareNumberString(item: any, keyPath: string[], filterValue: number) {
+  function compareNumberString(item: object, keyPath: string[], filterValue: FilterValue) {
     const value = get(item, keyPath)
+    const numericFilterValue = Number(filterValue)
+
+    if (Number.isNaN(numericFilterValue))
+      return false
 
     // for example: `1.2万`, `1.2萬`, `-` (indicates no data)
     if (typeof value === 'string' && (value.includes('万') || value.includes('萬'))) {
       const processedValue = value.replace(/万|萬/g, '')
-      return Number(processedValue) * 10000 > filterValue
+      return Number(processedValue) * 10000 > numericFilterValue
     }
 
     const numericValue = Number(value)
-    return !Number.isNaN(numericValue) && numericValue > filterValue
+    return !Number.isNaN(numericValue) && numericValue > numericFilterValue
   }
 
   // #region filter by title
@@ -78,11 +93,11 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
    * @param keyPath - The key path to access the title of the item.
    * @returns `true` if the title does not contain any of the filter keywords, `false` otherwise.
    */
-  function compareTitle(item: any, keyPath: string[], _filterValue: string) {
+  function compareTitle(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
 
     return !(filterByTitleStringValues.some(keyword => `${value}`.toUpperCase().includes(keyword))
-      || filterByTitleRegExpValues.some(regex => regex.test(value)))
+      || filterByTitleRegExpValues.some(regex => regex.test(String(value))))
   }
   // #endregion
 
@@ -105,11 +120,11 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
    * @param keyPath - The key path to access the value in the item.
    * @returns `true` if the item does not meet the filter criteria, `false` otherwise.
    */
-  function compareUser(item: any, keyPath: string[], _filterValue: string) {
+  function compareUser(item: object, keyPath: string[], _filterValue: FilterValue) {
     const value = get(item, keyPath)
 
     return !(filterByUserStringValues.includes(`${value}`.toUpperCase())
-      || filterByUserRegExpValues.some(regex => regex.test(value)))
+      || filterByUserRegExpValues.some(regex => regex.test(String(value))))
   }
   // #endregion
 
@@ -146,7 +161,7 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
     },
   }
 
-  const filter = ref<Function | null>(null)
+  const filter = ref<((item: object) => boolean) | null>(null)
 
   watch(() => [
     settings.value.filterOutVerticalVideos,
@@ -166,10 +181,10 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
     filter.value = factoryFilter(funcMap, filterOpt, keyList)
   }, { immediate: true })
 
-  function factoryFilter(funcMap: FuncMap, filterOpt: FilterType[], keyList: KeyPath): Function {
+  function factoryFilter(funcMap: FuncMap, filterOpt: FilterType[], keyList: KeyPath): (item: object) => boolean {
     interface FuncParams {
       keyPath: string[]
-      func: Function
+      func: FilterFunction
       value?: number | string
     }
 
@@ -177,14 +192,13 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
 
     filterOpt.forEach((type, index) => {
       const { func, enabledKey, valueKey } = funcMap[type]
-      if ((settings.value as { [key: string]: any })[enabledKey]) {
+      if (Reflect.get(settings.value, enabledKey)) {
+        const settingValue = valueKey ? Reflect.get(settings.value, valueKey) : ''
         const funcParams: FuncParams = {
           keyPath: keyList[index],
           func,
-          value: valueKey ? (settings.value as { [key: string]: any })[valueKey] : '',
+          value: typeof settingValue === 'number' || typeof settingValue === 'string' ? settingValue : '',
         }
-        // if (valueKey)
-        //   funcParams.value = (settings.value as { [key: string]: any })[valueKey]
         funcs.push(funcParams)
       }
     })
@@ -205,14 +219,14 @@ export function useFilter(isFollowedKeyPath: string[], filterOpt: FilterType[], 
     }
   }
 
-  function isAllowedContent(item: any): boolean {
+  function isAllowedContent(item: object): boolean {
     if (settings.value.recommendationMode === 'web') {
       const isFollowed = get(item, isFollowedKeyPath)
-      return isFollowed && settings.value.disableFilterForFollowedUser
+      return Boolean(isFollowed) && settings.value.disableFilterForFollowedUser
     }
     if (settings.value.recommendationMode === 'app') {
       const isFollowed = get(item, isFollowedKeyPath) === '已关注' || get(item, isFollowedKeyPath) === '已關注'
-      return isFollowed && settings.value.disableFilterForFollowedUser
+      return Boolean(isFollowed) && settings.value.disableFilterForFollowedUser
     }
     return false
   }

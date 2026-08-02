@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { Icon } from '@iconify/vue'
-
-import { useDark } from '~/composables/useDark'
-import { useDelayedHover } from '~/composables/useDelayedHover'
-import { settings } from '~/logic'
-
-import Tooltip from '../Tooltip.vue'
 import type { HoveringDockItem } from './types'
 
-const emit = defineEmits(['settings-visibility-change'])
+import { Icon } from '@iconify/vue'
+import { useDark } from '~/composables/useDark'
+import { useDelayedHover } from '~/composables/useDelayedHover'
+
+import { settings } from '~/logic'
+import Tooltip from '../Tooltip.vue'
+
+const emit = defineEmits(['settingsVisibilityChange'])
 const { isDark, toggleDark } = useDark()
 
 const hideSidebar = ref<boolean>(false)
@@ -106,7 +106,7 @@ function toggleHideSidebar(hide: boolean) {
           class="ctrl-btn group"
           style="backdrop-filter: var(--bew-filter-glass-1);"
           center size="small" round
-          @click="emit('settings-visibility-change')"
+          @click="emit('settingsVisibilityChange')"
         >
           <div mt--2px>
             <i

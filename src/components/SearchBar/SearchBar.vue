@@ -1,13 +1,13 @@
 <script setup lang="ts">
+import type { HistoryItem, SuggestionItem, SuggestionResponse } from './searchHistoryProvider'
 import { onKeyStroke, useDebounceFn } from '@vueuse/core'
-import DOMPurify from 'dompurify'
 
+import DOMPurify from 'dompurify'
 import { settings } from '~/logic'
 import api from '~/utils/api'
 import { findLeafActiveElement } from '~/utils/element'
-import { isHomePage } from '~/utils/main'
 
-import type { HistoryItem, SuggestionItem, SuggestionResponse } from './searchHistoryProvider'
+import { isHomePage } from '~/utils/main'
 import {
   addSearchHistory,
   clearAllSearchHistory,

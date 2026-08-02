@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { onKeyStroke, useMouseInElement } from '@vueuse/core'
 import type { Ref, UnwrapNestedRefs } from 'vue'
+import type { UnReadDm, UnReadMessage, UserInfo } from './types'
 
+import { onKeyStroke, useMouseInElement } from '@vueuse/core'
 import { useBewlyApp } from '~/composables/useAppProvider'
 import { useDelayedHover } from '~/composables/useDelayedHover'
 import { OVERLAY_SCROLL_BAR_SCROLL, TOP_BAR_VISIBILITY_CHANGE } from '~/constants/globalEvents'
@@ -9,8 +10,8 @@ import { AppPage } from '~/enums/appEnums'
 import { settings } from '~/logic'
 import api from '~/utils/api'
 import { getUserID, isHomePage } from '~/utils/main'
-import emitter from '~/utils/mitt'
 
+import emitter from '~/utils/mitt'
 import ChannelsPop from './components/ChannelsPop.vue'
 import FavoritesPop from './components/FavoritesPop.vue'
 import HistoryPop from './components/HistoryPop.vue'
@@ -21,17 +22,6 @@ import UploadPop from './components/UploadPop.vue'
 import WatchLaterPop from './components/WatchLaterPop.vue'
 import { updateInterval } from './notify'
 import OldUserPanelPop from './oldTopBarComponents/OldUserPanelPop.vue'
-import type { UnReadDm, UnReadMessage, UserInfo } from './types'
-
-// import { useTopBarStore } from '~/stores/topBarStore'
-
-// const popups = { NotificationsPop, MomentsPop, FavoritesPop, HistoryPop }
-
-// const topBarStore = useTopBarStore()
-
-// const topBarItems = computed(() => {
-//   return topBarStore.topBarItems
-// })
 
 const { activatedPage, scrollbarRef, reachTop } = useBewlyApp()
 

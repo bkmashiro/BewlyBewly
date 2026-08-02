@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useBewlyApp } from '~/composables/useAppProvider'
 import type { List as PopularAnimeItem, PopularAnimeResult } from '~/models/anime/popular'
 import type { ItemSubItem as RecommendationItem, RecommendationResult } from '~/models/anime/recommendation'
 import type { List as WatchListItem, WatchListResult } from '~/models/anime/watchList'
+import { useBewlyApp } from '~/composables/useAppProvider'
 import api from '~/utils/api'
 import { numFormatter } from '~/utils/dataFormatter'
 import { getUserID, openLinkToNewTab } from '~/utils/main'

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
 
-import { useBewlyApp } from '~/composables/useAppProvider'
 import type { GridLayoutType } from '~/logic'
-import type { List as VideoItem, TrendingResult } from '~/models/video/trending'
+import type { TrendingResult, List as VideoItem } from '~/models/video/trending'
+import { useBewlyApp } from '~/composables/useAppProvider'
 import api from '~/utils/api'
 
 // https://github.com/starknt/BewlyBewly/blob/fad999c2e482095dc3840bb291af53d15ff44130/src/contentScripts/views/Home/components/ForYou.vue#L16

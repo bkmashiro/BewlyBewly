@@ -1,5 +1,5 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "$schema": "https://unpkg.com/knip@6/schema.json",
   "paths": {
     "~/*": ["src/*"]
   },
@@ -8,16 +8,10 @@
     "src/components/**",
     "*.config.*"
   ],
-  "ignore": ["src/components/Settings/**"],
   "ignoreDependencies": [
     "@iconify/json",
-    "esbuild",
-    "uno.css",
-    "lint-staged",
-    "sass",
-    "terser"
+    "uno.css"
   ],
-  "ignoreBinaries": ["gh", "xcrun"],
   "rules": {
     "types": "off",
     "enumMembers": "off",

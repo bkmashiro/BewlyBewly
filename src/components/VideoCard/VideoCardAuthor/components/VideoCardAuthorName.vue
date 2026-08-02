@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { getAuthorJumpUrl } from '~/components/VideoCard/utils'
-
 import type { Author } from '../../types'
+
+import { getAuthorJumpUrl } from '~/components/VideoCard/utils'
 
 defineProps<{
   author?: Author | Author[]

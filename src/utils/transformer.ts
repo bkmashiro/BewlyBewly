@@ -1,6 +1,6 @@
 import type { MaybeElement } from '@vueuse/core'
-import { unrefElement, useElementVisibility } from '@vueuse/core'
 import type { CSSProperties } from 'vue'
+import { unrefElement, useElementVisibility } from '@vueuse/core'
 
 interface TransformerCenter {
   x?: boolean

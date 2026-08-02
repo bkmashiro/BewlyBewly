@@ -1,6 +1,6 @@
 # BewlyBewly 一次性现代化与动态过滤实施计划
 
-> 状态：待实施
+> 状态：实施中（阶段 A–C 已完成）
 > 基线：`main@d42143547bf4e9cc6864f227fcbcbd396bbff25b`（v0.41.1）
 > 目标：在一个集成分支内一次性交付现代化扩展工具链、升级后的应用依赖、`t.bilibili.com` 动态过滤，以及 Chromium/Firefox 的真实扩展验收；不做多个过渡版本。
 
@@ -200,6 +200,13 @@ pnpm knip
 pnpm build
 pnpm build:firefox
 ```
+
+实施记录（2026-08-02）：
+
+- 生产/工具链已升级到 Node 24 CI、pnpm 11.18、Vue 3.5、Pinia 4、VueUse 14、Vite 8、Vitest 4、ESLint 10、Knip 6、release-it 21；移除 `webext-bridge`、`release-it-pnpm`、`@types/dompurify` 与重复 import sorter。
+- pnpm 11 配置迁到 `pnpm-workspace.yaml`，启用严格 peer、`trustPolicy: no-downgrade`、显式 build-script allowlist 和短期供应链版本钉住；删除 `shamefully-hoist` 与旧 `.npmrc` 宽松配置。
+- TypeScript 7.0.2 在本次执行时仍处于 `minimumReleaseAge` 窗口，未绕过供应链策略；固定到已通过 Vue/WXT 全量类型与三浏览器构建 gate 的 TypeScript 6.0.3。
+- `release-it-pnpm` 被 pnpm 11 判定为高风险 trust downgrade，已由 release-it 21 原生 `npm.publish: false` 配置替代；发布 dry-run 已能加载新 CLI，完整 dry-run 留到干净提交后执行。
 
 额外约束：安装日志中不得遗留 unresolved peer dependency；允许有明确上游来源且记录过的 deprecation，但本仓库直接依赖不得是 deprecated 包。
 

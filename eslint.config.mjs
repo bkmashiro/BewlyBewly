@@ -1,5 +1,4 @@
 import antfu from '@antfu/eslint-config'
-import simpleImportSort from 'eslint-plugin-simple-import-sort'
 
 export default antfu(
   {
@@ -33,17 +32,6 @@ export default antfu(
         '.output',
         '.wxt',
       ],
-    },
-  },
-  {
-    plugins: {
-      'simple-import-sort': simpleImportSort,
-    },
-    rules: {
-      'import/order': 'off',
-      'sort-imports': 'off',
-      'simple-import-sort/imports': 'error',
-      'simple-import-sort/exports': 'error',
     },
   },
 )

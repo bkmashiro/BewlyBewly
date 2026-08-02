@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { Ref } from 'vue'
 
+import type { FavoriteCategory, FavoriteResource } from '../types'
 import Empty from '~/components/Empty.vue'
 import Loading from '~/components/Loading.vue'
 import api from '~/utils/api'
 import { calcCurrentTime } from '~/utils/dataFormatter'
-import { getUserID, removeHttpFromUrl, scrollToTop } from '~/utils/main'
 
-import type { FavoriteCategory, FavoriteResource } from '../types'
+import { getUserID, removeHttpFromUrl, scrollToTop } from '~/utils/main'
 
 const favoriteCategories = reactive<Array<FavoriteCategory>>([])
 const favoriteResources = reactive<Array<FavoriteResource>>([])

@@ -2,16 +2,25 @@ import browser from 'webextension-polyfill'
 
 interface Message {
   contentScriptQuery: string
-  [key: string]: any
+  url: string
 }
 
 export enum TABS_MESSAGE {
   OPEN_LINK_IN_BACKGROUND = 'openLinkInBackground',
 }
 
-function handleMessage(message: Message) {
-  if (message.contentScriptQuery === TABS_MESSAGE.OPEN_LINK_IN_BACKGROUND) {
-    return browser.tabs.create({ url: message.url, active: false })
+function isMessage(value: unknown): value is Message {
+  return typeof value === 'object'
+    && value !== null
+    && 'contentScriptQuery' in value
+    && typeof value.contentScriptQuery === 'string'
+    && 'url' in value
+    && typeof value.url === 'string'
+}
+
+function handleMessage(value: unknown) {
+  if (isMessage(value) && value.contentScriptQuery === TABS_MESSAGE.OPEN_LINK_IN_BACKGROUND) {
+    return browser.tabs.create({ url: value.url, active: false })
   }
 }
 

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import type { Video } from '~/components/VideoCard/types'
 import { Icon } from '@iconify/vue'
 import { onKeyStroke } from '@vueuse/core'
 import { useI18n } from 'vue-i18n'
-import { useToast } from 'vue-toastification'
 
-import type { Video } from '~/components/VideoCard/types'
+import { useToast } from 'vue-toastification'
 import { accessKey } from '~/logic'
 import { Type as ThreePointV2Type } from '~/models/video/appForYou'
 import api from '~/utils/api'
