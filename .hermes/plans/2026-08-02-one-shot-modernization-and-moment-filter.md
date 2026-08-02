@@ -1,6 +1,6 @@
 # BewlyBewly 一次性现代化与动态过滤实施计划
 
-> 状态：实施中（阶段 A–C 已完成）
+> 状态：已完成（阶段 A–I）
 > 基线：`main@d42143547bf4e9cc6864f227fcbcbd396bbff25b`（v0.41.1）
 > 目标：在一个集成分支内一次性交付现代化扩展工具链、升级后的应用依赖、`t.bilibili.com` 动态过滤，以及 Chromium/Firefox 的真实扩展验收；不做多个过渡版本。
 
@@ -452,3 +452,40 @@ pnpm zip:firefox
 9. **release 流程意外提交/发布**：所有 submit/store 命令保持手动；实施和验收阶段禁止运行。
 
 止损条件：若迁移后无法同时恢复 Chromium + Firefox 的 manifest/runtime 合同，或必须长期保留新旧双构建链，停止合并并回滚 WXT 迁移；重新评估，但不交付半迁移状态。
+
+## 9. 最终验收记录（2026-08-02）
+
+### 9.1 工具链与质量门禁
+
+- 精确环境：Node `v24.18.1`、pnpm `11.18.0`，`pnpm install --frozen-lockfile` 通过。
+- `pnpm test`：10 个测试文件、47 项测试通过；manifest contract 另有 5 项通过。
+- `pnpm typecheck`、`pnpm lint`、`pnpm knip` 全部通过；新增 Moments 设置页由 `eslint-plugin-vuejs-accessibility` 推荐规则静态门禁覆盖。
+- Chromium、Firefox、Safari MV3 构建通过；Firefox `web-ext lint` 为 0 error、3 个既有 bundle warning。
+- `release-it --dry-run --ci patch` 通过，未提交、打 tag、上传或发布。
+- `pnpm outdated` 仅剩两个有意保留项：`@types/node` 固定 24.x 以匹配 CI/runtime，TypeScript 7.0.2 因发布时间与兼容性门槛暂不采用；当前为 TS 6.0.3。
+
+### 9.2 动态过滤验收
+
+- 使用 Google Chrome for Testing `149.0.7827.55` 从 `.output/chrome-mv3` 加载真实 unpacked extension。
+- 在公开的 `https://t.bilibili.com/` 真实页面上确认：3 张原版动态卡保持原 DOM；新增内容规则后 1 张被隐藏、3 张获得快捷规则入口，设置页实时显示规则。
+- 从卡片快捷菜单新增“允许作者”规则后，存储内出现 allow + hide 两条规则，白名单优先逻辑和存储同步均生效。
+- 设置关闭时不创建 feed observer；启用后 style/observer 才挂载。首屏、added subtree、root replacement、路由事件、`pagehide/pageshow`、清理恢复均有确定性测试。
+- 500 卡 synthetic 队列以 100 张/批处理，定向测试耗时 `154 ms`，没有全量重复扫描。
+
+### 9.3 视觉与无障碍
+
+- 真实页面 1280×900 smoke：Bewly 顶栏、Bilibili 原版动态布局、设置弹层均无新增空白、错位或横向溢出。
+- 480×800 窄窗口复验后，将 Bewly Pages 子导航改为响应式顶部按钮组；Moments Filter 内容可完整滚动，无横向内容裁切。
+- 快捷菜单改为触发器下方纵向菜单，不再侵入左侧登录栏；菜单含可读 label、键盘 Escape/焦点恢复与 `role="menu"`/`menuitem`。
+
+### 9.4 归档
+
+- Chromium：`.output/bewly-bewly-0.41.1-chrome.zip`，16,196,550 bytes，SHA-256 `63d492a48460d8cf5ebadaab2f4035c37b86b1e694e5183d1b2ff772e56e8dcf`。
+- Firefox：`.output/bewly-bewly-0.41.1-firefox.zip`，16,196,884 bytes，SHA-256 `d4b5f1cfb96176debb121fd3a1a53f9ab5b858d24b7d273da3f7f8b4f3dd9e66`。
+- Sources：`.output/bewly-bewly-0.41.1-sources.zip`，16,132,230 bytes，SHA-256 `f600efad5763f52099558129e121eafeff323fe5c0d8b5160c6758f33bd4d493`。
+- 三个归档均通过 `unzip -tq`。
+
+### 9.5 环境覆盖边界
+
+- 本机没有 Firefox.app，因此未伪报 Firefox runtime smoke；Firefox 以 MV3 build、manifest contract、archive integrity 和 `web-ext lint` 覆盖。
+- 隔离 Chromium profile 未使用任何用户凭据，因此真实 smoke 为公开动态页；登录态无限滚动和 BFCache 行为由脱敏 fixture 与 MutationObserver/route/page lifecycle 测试覆盖。
