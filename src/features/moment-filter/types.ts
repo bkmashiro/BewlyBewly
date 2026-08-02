@@ -75,3 +75,9 @@ export interface StorageChangeSource {
   addListener: (listener: StorageChangeListener) => void
   removeListener: (listener: StorageChangeListener) => void
 }
+
+export interface MomentFilterStorage {
+  load: () => Promise<MomentFilterLoadResult>
+  save: (input: unknown) => Promise<MomentFilterSettingsV1>
+  subscribe: (listener: (result: MomentFilterLoadResult) => void) => () => void
+}

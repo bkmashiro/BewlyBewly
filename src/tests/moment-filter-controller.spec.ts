@@ -1,0 +1,232 @@
+import type {
+  MomentFilterLoadResult,
+  MomentFilterSettingsV1,
+  MomentFilterStorage,
+} from '~/features/moment-filter/types'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import {
+  createMomentFilterController,
+  MOMENT_FILTERED_ATTRIBUTE,
+} from '~/features/moment-filter/controller'
+
+function settings(enabled = true): MomentFilterSettingsV1 {
+  return {
+    schemaVersion: 1,
+    enabled,
+    mode: 'any',
+    rules: [{
+      id: 'hide-author',
+      enabled: true,
+      action: 'hide',
+      field: 'authorUid',
+      operator: 'equals',
+      value: '10001',
+      createdAt: 1,
+    }],
+  }
+}
+
+function loadResult(value: MomentFilterSettingsV1): MomentFilterLoadResult {
+  return { status: 'loaded', value, issues: [] }
+}
+
+function createStorage(initial = settings()) {
+  let listener: ((result: MomentFilterLoadResult) => void) | undefined
+  const storage: MomentFilterStorage = {
+    load: vi.fn(async () => loadResult(initial)),
+    save: vi.fn(async input => input as MomentFilterSettingsV1),
+    subscribe(callback) {
+      listener = callback
+      return () => {
+        listener = undefined
+      }
+    },
+  }
+  return {
+    storage,
+    emit(value: MomentFilterSettingsV1) {
+      listener?.(loadResult(value))
+    },
+  }
+}
+
+function card(uid = '10001', text = 'Fixture text'): HTMLElement {
+  const element = document.createElement('div')
+  element.className = 'bili-dyn-list__item'
+  element.innerHTML = `
+    <header><a href="https://space.bilibili.com/${uid}/dynamic"><span class="bili-dyn-title__text">Fixture Author</span></a></header>
+    <div class="dyn-card-opus"><div class="dyn-card-opus__summary">${text}</div></div>
+  `
+  return element
+}
+
+function mountFeed(cards: Element[]): Element {
+  document.body.innerHTML = '<div class="bili-dyn-home--visitor"><div class="bili-dyn-list__items"></div></div>'
+  const list = document.querySelector('.bili-dyn-list__items')!
+  list.append(...cards)
+  return list
+}
+
+async function flushMutations(): Promise<void> {
+  await Promise.resolve()
+  await new Promise(resolve => setTimeout(resolve, 0))
+}
+
+const cleanups: Array<() => void> = []
+afterEach(() => {
+  cleanups.splice(0).forEach(cleanup => cleanup())
+  document.body.innerHTML = ''
+  document.head.querySelectorAll('[data-bewly-moment-filter]').forEach(element => element.remove())
+})
+
+describe('moment filter controller', () => {
+  it('scans existing cards, filters inserted cards, and skips unchanged fingerprints', async () => {
+    const first = card()
+    const list = mountFeed([first])
+    const { storage } = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage,
+      getHref: () => 'https://t.bilibili.com/',
+    })
+    cleanups.push(controller.cleanup)
+
+    await flushMutations()
+    expect(first.getAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe('true')
+    expect(controller.getStats()).toEqual({ evaluated: 1, hidden: 1 })
+
+    first.setAttribute('data-unrelated', 'unchanged')
+    const second = card()
+    list.append(second)
+    await flushMutations()
+
+    expect(second.getAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe('true')
+    expect(controller.getStats()).toEqual({ evaluated: 2, hidden: 2 })
+  })
+
+  it('uses zero feed filtering while disabled and restores its own hidden cards', async () => {
+    const first = card()
+    const list = mountFeed([first])
+    const fake = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage: fake.storage,
+      getHref: () => 'https://t.bilibili.com/',
+    })
+    cleanups.push(controller.cleanup)
+    await flushMutations()
+
+    fake.emit(settings(false))
+    const second = card()
+    list.append(second)
+    await flushMutations()
+
+    expect(first.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+    expect(second.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+    expect(document.querySelector('[data-bewly-moment-filter]')).toBeNull()
+  })
+
+  it('rebinds when the feed root is replaced', async () => {
+    const first = card()
+    const list = mountFeed([first])
+    const { storage } = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage,
+      getHref: () => 'https://t.bilibili.com/',
+    })
+    cleanups.push(controller.cleanup)
+    await flushMutations()
+
+    const replacement = document.createElement('div')
+    replacement.className = 'bili-dyn-list__items'
+    const second = card()
+    replacement.append(second)
+    list.replaceWith(replacement)
+    await flushMutations()
+
+    expect(second.getAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe('true')
+  })
+
+  it('reads the current URL on route events and cleans up on page hide', async () => {
+    const first = card()
+    mountFeed([first])
+    const fake = createStorage()
+    let href = 'https://t.bilibili.com/'
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage: fake.storage,
+      getHref: () => href,
+    })
+    cleanups.push(controller.cleanup)
+    await flushMutations()
+    expect(first.getAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe('true')
+
+    href = 'https://www.bilibili.com/'
+    window.dispatchEvent(new CustomEvent('historyChange'))
+    expect(first.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+
+    href = 'https://t.bilibili.com/'
+    window.dispatchEvent(new CustomEvent('historyChange'))
+    await flushMutations()
+    expect(first.getAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe('true')
+
+    window.dispatchEvent(new PageTransitionEvent('pagehide'))
+    expect(first.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+  })
+
+  it('processes large queues in bounded batches', async () => {
+    const cards = Array.from({ length: 500 }, () => card())
+    mountFeed(cards)
+    const callbacks: Array<() => void> = []
+    const { storage } = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage,
+      batchSize: 100,
+      getHref: () => 'https://t.bilibili.com/',
+      schedule: callback => callbacks.push(callback),
+    })
+    cleanups.push(controller.cleanup)
+    await Promise.resolve()
+
+    const startedAt = performance.now()
+    let batches = 0
+    while (callbacks.length > 0) {
+      callbacks.shift()!()
+      batches += 1
+    }
+
+    const durationMs = performance.now() - startedAt
+    expect(batches).toBe(5)
+    expect(controller.getStats()).toEqual({ evaluated: 500, hidden: 500 })
+    expect(durationMs).toBeLessThan(1000)
+  })
+
+  it('stops responding and restores cards after cleanup', async () => {
+    const first = card()
+    const list = mountFeed([first])
+    const { storage } = createStorage()
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage,
+      getHref: () => 'https://t.bilibili.com/',
+    })
+    await flushMutations()
+    controller.cleanup()
+
+    const second = card()
+    list.append(second)
+    await flushMutations()
+
+    expect(first.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+    expect(second.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+  })
+})

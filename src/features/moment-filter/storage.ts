@@ -2,6 +2,7 @@ import type {
   ExtensionStorageArea,
   MomentFilterLoadResult,
   MomentFilterSettingsV1,
+  MomentFilterStorage,
   StorageChangeListener,
   StorageChangeSource,
 } from './types'
@@ -44,7 +45,7 @@ function decodeStoredValue(input: unknown): MomentFilterLoadResult {
 export function createMomentFilterStorage(
   area: ExtensionStorageArea,
   changes?: StorageChangeSource,
-) {
+): MomentFilterStorage {
   return {
     async load(): Promise<MomentFilterLoadResult> {
       try {

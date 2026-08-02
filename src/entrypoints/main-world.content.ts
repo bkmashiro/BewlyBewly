@@ -16,15 +16,16 @@ function setupMainWorld() {
   const notifyLocationChange = () => notify()
 
   window.history.pushState = (...args) => {
+    const result = originalPushState(...args)
     notify(...args)
-    return originalPushState(...args)
+    return result
   }
   window.history.replaceState = (...args) => {
+    const result = originalReplaceState(...args)
     notify(...args)
-    return originalReplaceState(...args)
+    return result
   }
   window.history.forward = () => {
-    notify()
     return originalForward()
   }
   window.addEventListener('popstate', notifyLocationChange)
