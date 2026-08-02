@@ -5,6 +5,7 @@ import { useI18n } from 'vue-i18n'
 
 import { createBrowserMomentFilterStorage } from '~/features/moment-filter/browser-storage'
 import { createDefaultMomentFilterSettings } from '~/features/moment-filter/defaults'
+import { createLatestRequestGuard } from '~/features/moment-filter/latest-request-guard'
 import { createBrowserPromotionLearningStorage } from '~/features/moment-filter/promotion-browser-storage'
 import { createEmptyPromotionLearningState } from '~/features/moment-filter/promotion-learning'
 import {
@@ -20,6 +21,7 @@ import MomentRuleTable from './MomentRuleTable.vue'
 const { t } = useI18n()
 const storage = createBrowserMomentFilterStorage()
 const promotionStorage = createBrowserPromotionLearningStorage()
+const loadGuard = createLatestRequestGuard()
 const model = ref<MomentFilterSettingsV1>(createDefaultMomentFilterSettings())
 const promotionModel = ref<PromotionLearningState>(createEmptyPromotionLearningState())
 const busy = ref(true)
@@ -35,10 +37,13 @@ let unsubscribeStorage: (() => void) | undefined
 let unsubscribePromotionStorage: (() => void) | undefined
 
 onMounted(async () => {
+  const canCommit = loadGuard.next()
   const [result, promotionResult] = await Promise.all([
     storage.load(),
     promotionStorage.load(),
   ])
+  if (!canCommit())
+    return
   model.value = result.value
   promotionModel.value = promotionResult.value
   recoveredSettings.value = result.status === 'recovered'
@@ -55,6 +60,7 @@ onMounted(async () => {
 })
 
 onBeforeUnmount(() => {
+  loadGuard.dispose()
   unsubscribeStorage?.()
   unsubscribePromotionStorage?.()
 })

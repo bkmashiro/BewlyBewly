@@ -178,6 +178,30 @@ describe('moment filter controller', () => {
     expect(promotionCard.querySelector('[data-promotion-status]')).toBeNull()
   })
 
+  it('re-evaluates a reused card when its data-mid fallback author changes', async () => {
+    const reusedCard = document.createElement('div')
+    reusedCard.className = 'bili-dyn-list__item'
+    reusedCard.innerHTML = `
+      <header class="bili-dyn-item__following" data-mid="10001"><span class="bili-dyn-title__text">Fixture Author</span></header>
+      <div class="dyn-card-opus"><div class="dyn-card-opus__summary">Fixture text</div></div>
+    `
+    mountFeed([reusedCard])
+    const controller = createMomentFilterController({
+      window,
+      document,
+      storage: createStorage().storage,
+      getHref: () => 'https://t.bilibili.com/',
+    })
+    cleanups.push(controller.cleanup)
+
+    await flushMutations()
+    expect(reusedCard.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(true)
+
+    reusedCard.querySelector<HTMLElement>('[data-mid]')!.dataset.mid = '20002'
+    await flushMutations()
+    expect(reusedCard.hasAttribute(MOMENT_FILTERED_ATTRIBUTE)).toBe(false)
+  })
+
   it('scans existing cards, filters inserted cards, and skips unchanged fingerprints', async () => {
     const first = card()
     const list = mountFeed([first])

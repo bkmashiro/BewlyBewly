@@ -230,7 +230,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
     feedObserver = createObserver(handleFeedMutations)
     feedObserver.observe(feedRoot, {
       attributes: true,
-      attributeFilter: ['aria-label', 'class', 'data-dyn-card-type', 'href'],
+      attributeFilter: ['aria-label', 'class', 'data-dyn-card-type', 'data-mid', 'href'],
       characterData: true,
       childList: true,
       subtree: true,

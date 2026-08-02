@@ -10,6 +10,7 @@ import { OVERLAY_SCROLL_BAR_SCROLL, TOP_BAR_VISIBILITY_CHANGE } from '~/constant
 import { AppPage } from '~/enums/appEnums'
 import { createBrowserMomentFilterStorage } from '~/features/moment-filter/browser-storage'
 import { resolveEffectiveMomentUnreadFromSources } from '~/features/moment-filter/effective-unread-service'
+import { createLatestRequestGuard } from '~/features/moment-filter/latest-request-guard'
 import { createBrowserPromotionLearningStorage } from '~/features/moment-filter/promotion-browser-storage'
 import { settings } from '~/logic'
 import api from '~/utils/api'
@@ -34,6 +35,9 @@ const { activatedPage, scrollbarRef, reachTop } = useBewlyApp()
 const { isDark } = useDark()
 const momentFilterStorage = createBrowserMomentFilterStorage()
 const promotionLearningStorage = createBrowserPromotionLearningStorage()
+const momentUnreadRequestGuard = createLatestRequestGuard()
+let pollingIntervalId: number | undefined
+let disposed = false
 
 const mid = getUserID() || ''
 const userInfo = reactive<UserInfo | NonNullable<unknown>>({}) as UnwrapNestedRefs<UserInfo>
@@ -333,15 +337,21 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  disposed = true
+  momentUnreadRequestGuard.dispose()
+  if (pollingIntervalId !== undefined)
+    window.clearInterval(pollingIntervalId)
   window.removeEventListener('scroll', handleScroll)
   emitter.off(OVERLAY_SCROLL_BAR_SCROLL)
 })
 
 async function initData() {
   await getUserInfo()
+  if (disposed)
+    return
 
   // automatically update notifications and moments count
-  setInterval(() => {
+  pollingIntervalId = window.setInterval(() => {
     getUnreadMessageCount()
     getTopBarNewMomentsCount()
   }, updateInterval)
@@ -443,6 +453,7 @@ function handleNotificationsItemClick(item: { name: string, url: string, unreadC
 const newMomentsCount = ref<number>(0)
 
 async function getTopBarNewMomentsCount() {
+  const canCommit = momentUnreadRequestGuard.next()
   if (!isLogin.value)
     return
 
@@ -465,7 +476,8 @@ async function getTopBarNewMomentsCount() {
     }
   }
   finally {
-    newMomentsCount.value = result
+    if (canCommit())
+      newMomentsCount.value = result
   }
 }
 // #endregion
