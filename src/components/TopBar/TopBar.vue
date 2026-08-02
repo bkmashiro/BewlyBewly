@@ -8,6 +8,9 @@ import { useDark } from '~/composables/useDark'
 import { useDelayedHover } from '~/composables/useDelayedHover'
 import { OVERLAY_SCROLL_BAR_SCROLL, TOP_BAR_VISIBILITY_CHANGE } from '~/constants/globalEvents'
 import { AppPage } from '~/enums/appEnums'
+import { createBrowserMomentFilterStorage } from '~/features/moment-filter/browser-storage'
+import { resolveEffectiveMomentUnreadFromSources } from '~/features/moment-filter/effective-unread-service'
+import { createBrowserPromotionLearningStorage } from '~/features/moment-filter/promotion-browser-storage'
 import { settings } from '~/logic'
 import api from '~/utils/api'
 import { getUserID, isHomePage, isInIframe } from '~/utils/main'
@@ -29,6 +32,8 @@ import { updateInterval } from './notify'
 
 const { activatedPage, scrollbarRef, reachTop } = useBewlyApp()
 const { isDark } = useDark()
+const momentFilterStorage = createBrowserMomentFilterStorage()
+const promotionLearningStorage = createBrowserPromotionLearningStorage()
 
 const mid = getUserID() || ''
 const userInfo = reactive<UserInfo | NonNullable<unknown>>({}) as UnwrapNestedRefs<UserInfo>
@@ -448,6 +453,15 @@ async function getTopBarNewMomentsCount() {
     if (res.code === 0) {
       if (typeof res.data.update_info.item.count === 'number')
         result = res.data.update_info.item.count
+      result = await resolveEffectiveMomentUnreadFromSources(result, {
+        loadFilter: () => momentFilterStorage.load(),
+        loadPromotion: () => promotionLearningStorage.load(),
+        fetchFeed: () => api.moment.getMoments({
+          type: 'all',
+          offset: 0,
+          update_baseline: '',
+        }),
+      })
     }
   }
   finally {
