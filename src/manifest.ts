@@ -2,9 +2,26 @@ import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 
 import type PkgType from '../package.json'
-import { isDev, isFirefox, isSafari, port, r } from '../scripts/utils'
+import {
+  isDev as buildIsDev,
+  isFirefox as buildIsFirefox,
+  isSafari as buildIsSafari,
+  port,
+  r,
+} from '../scripts/utils'
 
-export async function getManifest() {
+export interface ManifestBuildOptions {
+  isDev: boolean
+  isFirefox: boolean
+  isSafari: boolean
+}
+
+export async function getManifest(options: Partial<ManifestBuildOptions> = {}) {
+  const {
+    isDev = buildIsDev,
+    isFirefox = buildIsFirefox,
+    isSafari = buildIsSafari,
+  } = options
   const pkg = await fs.readJSON(r('package.json')) as typeof PkgType
 
   // update this file to update this manifest.json

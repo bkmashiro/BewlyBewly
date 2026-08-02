@@ -1,0 +1,11 @@
+{
+  "language": "cmn-CN",
+  "theme": "dark",
+  "themeColor": "#fb7299",
+  "enableFilterByTitle": true,
+  "filterByTitle": [{ "keyword": "广告", "remark": "existing title rule" }],
+  "enableFilterByUser": true,
+  "filterByUser": [{ "keyword": "123456", "remark": "existing user rule" }],
+  "dockItemVisibilityList": [{ "page": "Home", "visible": false }],
+  "legacyUnknownField": "must-survive"
+}

@@ -215,7 +215,19 @@ export const originalSettings: Settings = {
   useOriginalBilibiliHomepage: false,
 }
 
-export const settings = useStorageLocal('settings', ref<Settings>(originalSettings), { mergeDefaults: true })
+export function mergeSettingsDefaults(
+  storageValue: Record<string, unknown>,
+  defaults: Settings = originalSettings,
+): Settings {
+  return {
+    ...structuredClone(defaults),
+    ...structuredClone(storageValue),
+  } as Settings
+}
+
+export const settings = useStorageLocal('settings', ref<Settings>(originalSettings), {
+  mergeDefaults: (storageValue, defaults) => mergeSettingsDefaults(storageValue, defaults),
+})
 
 export type GridLayoutType = 'adaptive' | 'twoColumns' | 'oneColumn'
 
