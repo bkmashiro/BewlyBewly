@@ -344,7 +344,16 @@ settings:
   moment_filter_export: Export JSON
   moment_filter_import_preview: Import preview
   moment_filter_import_counts: 'Added {added}, updated {updated}, unchanged {unchanged}, removed {removed}.'
-  moment_filter_recovered: Invalid stored moment-filter data was ignored and safe defaults were restored.
+  moment_filter_recovered: Invalid Moments filter storage was ignored and safe defaults were restored.
+  moment_filter_learning_title: Promotion learning library
+  moment_filter_learning_desc: Confirmed author-scoped keywords, domains, and commercial signals. Full moment text is never stored.
+  moment_filter_learning_empty: No learned promotion signatures yet. Confirm a suspected promotion on the original Moments page to add one.
+  moment_filter_learning_author: 'Author UID {uid}'
+  moment_filter_learning_global: Global signature
+  moment_filter_learning_keywords: 'Keywords: {values}'
+  moment_filter_learning_domains: 'Domains: {values}'
+  moment_filter_learning_signals: 'Commercial signals: {values}'
+  moment_filter_learning_delete_confirm: Remove this learned promotion signature?
 
   contributors: Contributors
 

@@ -340,6 +340,15 @@ settings:
   moment_filter_import_preview: 导入预览
   moment_filter_import_counts: '新增 {added} 条，更新 {updated} 条，未变化 {unchanged} 条，移除 {removed} 条。'
   moment_filter_recovered: 检测到无效的动态过滤存储数据，已忽略并恢复安全默认值。
+  moment_filter_learning_title: 推广学习库
+  moment_filter_learning_desc: 保存已确认的作者作用域关键词、域名和商业信号；不会保存完整动态正文。
+  moment_filter_learning_empty: 还没有学习记录。可在原版动态页确认一条疑似推广。
+  moment_filter_learning_author: 'UP 主 UID {uid}'
+  moment_filter_learning_global: 全局学习规则
+  moment_filter_learning_keywords: '关键词：{values}'
+  moment_filter_learning_domains: '域名：{values}'
+  moment_filter_learning_signals: '商业信号：{values}'
+  moment_filter_learning_delete_confirm: 删除这条推广学习记录吗？
 
   contributors: 贡献者
 

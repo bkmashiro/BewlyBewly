@@ -341,6 +341,15 @@ settings:
   moment_filter_import_preview: 匯入預覽
   moment_filter_import_counts: '新增 {added} 條，更新 {updated} 條，未變更 {unchanged} 條，移除 {removed} 條。'
   moment_filter_recovered: 偵測到無效的動態過濾儲存資料，已忽略並恢復安全預設值。
+  moment_filter_learning_title: 推廣學習庫
+  moment_filter_learning_desc: 儲存已確認的作者範圍關鍵字、網域與商業訊號；不會儲存完整動態正文。
+  moment_filter_learning_empty: 尚無學習記錄。可在原版動態頁確認一則疑似推廣。
+  moment_filter_learning_author: 'UP 主 UID {uid}'
+  moment_filter_learning_global: 全域學習規則
+  moment_filter_learning_keywords: '關鍵字：{values}'
+  moment_filter_learning_domains: '網域：{values}'
+  moment_filter_learning_signals: '商業訊號：{values}'
+  moment_filter_learning_delete_confirm: 刪除這筆推廣學習記錄嗎？
 
   contributors: 貢獻者
 

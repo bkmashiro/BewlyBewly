@@ -338,7 +338,16 @@ settings:
   moment_filter_export: 匯出 JSON
   moment_filter_import_preview: 匯入預覽
   moment_filter_import_counts: '新增 {added} 條，更新 {updated} 條，冇變 {unchanged} 條，移除 {removed} 條。'
-  moment_filter_recovered: 發現無效嘅動向過濾儲存資料，已經忽略並回復安全預設值。
+  moment_filter_recovered: 偵測到無效嘅動態過濾儲存資料，已忽略並恢復安全預設值。
+  moment_filter_learning_title: 推廣學習庫
+  moment_filter_learning_desc: 儲存確認咗嘅作者範圍關鍵字、網域同商業訊號；唔會儲存完整動態正文。
+  moment_filter_learning_empty: 暫時未有學習記錄。可以喺原版動態頁確認一則疑似推廣。
+  moment_filter_learning_author: 'UP 主 UID {uid}'
+  moment_filter_learning_global: 全域學習規則
+  moment_filter_learning_keywords: '關鍵字：{values}'
+  moment_filter_learning_domains: '網域：{values}'
+  moment_filter_learning_signals: '商業訊號：{values}'
+  moment_filter_learning_delete_confirm: 刪除呢筆推廣學習記錄？
 
   contributors: 貢獻者
 

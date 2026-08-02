@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import type { PromotionLearningState, PromotionSignature } from '~/features/moment-filter/promotion-learning'
 import type { MomentFilterRule, MomentFilterSettingsV1 } from '~/features/moment-filter/types'
 import { useI18n } from 'vue-i18n'
 
 import { createBrowserMomentFilterStorage } from '~/features/moment-filter/browser-storage'
 import { createDefaultMomentFilterSettings } from '~/features/moment-filter/defaults'
+import { createBrowserPromotionLearningStorage } from '~/features/moment-filter/promotion-browser-storage'
+import { createEmptyPromotionLearningState } from '~/features/moment-filter/promotion-learning'
 import {
   exportMomentFilterSettings,
   planMomentFilterImport,
@@ -16,29 +19,45 @@ import MomentRuleTable from './MomentRuleTable.vue'
 
 const { t } = useI18n()
 const storage = createBrowserMomentFilterStorage()
+const promotionStorage = createBrowserPromotionLearningStorage()
 const model = ref<MomentFilterSettingsV1>(createDefaultMomentFilterSettings())
+const promotionModel = ref<PromotionLearningState>(createEmptyPromotionLearningState())
 const busy = ref(true)
 const errorMessage = ref('')
 const recoveredSettings = ref(false)
+const recoveredPromotion = ref(false)
 const showEditor = ref(false)
 const editingRule = ref<MomentFilterRule>()
 const importInput = ref<HTMLInputElement>()
 const importMode = ref<'merge' | 'replace'>('merge')
 const importPreview = ref<ReturnType<typeof planMomentFilterImport>>()
 let unsubscribeStorage: (() => void) | undefined
+let unsubscribePromotionStorage: (() => void) | undefined
 
 onMounted(async () => {
-  const result = await storage.load()
+  const [result, promotionResult] = await Promise.all([
+    storage.load(),
+    promotionStorage.load(),
+  ])
   model.value = result.value
+  promotionModel.value = promotionResult.value
   recoveredSettings.value = result.status === 'recovered'
+  recoveredPromotion.value = promotionResult.status === 'recovered'
   busy.value = false
   unsubscribeStorage = storage.subscribe((change) => {
     model.value = change.value
     recoveredSettings.value = change.status === 'recovered'
   })
+  unsubscribePromotionStorage = promotionStorage.subscribe((change) => {
+    promotionModel.value = change.value
+    recoveredPromotion.value = change.status === 'recovered'
+  })
 })
 
-onBeforeUnmount(() => unsubscribeStorage?.())
+onBeforeUnmount(() => {
+  unsubscribeStorage?.()
+  unsubscribePromotionStorage?.()
+})
 
 async function persist(next: MomentFilterSettingsV1): Promise<void> {
   busy.value = true
@@ -96,6 +115,26 @@ function deleteRule(rule: MomentFilterRule): void {
   if (editingRule.value?.id === rule.id)
     showEditor.value = false
   void persist({ ...model.value, rules })
+}
+
+async function deletePromotionSignature(signature: PromotionSignature): Promise<void> {
+  if (!window.confirm(t('settings.moment_filter_learning_delete_confirm')))
+    return
+  busy.value = true
+  errorMessage.value = ''
+  try {
+    promotionModel.value = await promotionStorage.save({
+      ...promotionModel.value,
+      signatures: promotionModel.value.signatures.filter(item => item.id !== signature.id),
+    })
+    recoveredPromotion.value = false
+  }
+  catch (error) {
+    errorMessage.value = error instanceof Error ? error.message : String(error)
+  }
+  finally {
+    busy.value = false
+  }
 }
 
 function exportRules(): void {
@@ -215,6 +254,43 @@ function confirmImport(): void {
       />
     </section>
 
+    <section class="learning-section" aria-labelledby="moment-filter-learning-title">
+      <div class="section-header">
+        <div>
+          <h2 id="moment-filter-learning-title">
+            {{ $t('settings.moment_filter_learning_title') }}
+          </h2>
+          <p>{{ $t('settings.moment_filter_learning_desc') }}</p>
+        </div>
+      </div>
+      <p v-if="promotionModel.signatures.length === 0" class="learning-empty">
+        {{ $t('settings.moment_filter_learning_empty') }}
+      </p>
+      <ul v-else class="learning-list">
+        <li v-for="signature in promotionModel.signatures" :key="signature.id" class="learning-item">
+          <div>
+            <strong>
+              {{ signature.authorUid
+                ? $t('settings.moment_filter_learning_author', { uid: signature.authorUid })
+                : $t('settings.moment_filter_learning_global') }}
+            </strong>
+            <p v-if="signature.keywords.length">
+              {{ $t('settings.moment_filter_learning_keywords', { values: signature.keywords.join(', ') }) }}
+            </p>
+            <p v-if="signature.domains.length">
+              {{ $t('settings.moment_filter_learning_domains', { values: signature.domains.join(', ') }) }}
+            </p>
+            <p v-if="signature.commercialSignals.length">
+              {{ $t('settings.moment_filter_learning_signals', { values: signature.commercialSignals.join(', ') }) }}
+            </p>
+          </div>
+          <Button type="tertiary" @click="deletePromotionSignature(signature)">
+            {{ $t('common.operation.delete') }}
+          </Button>
+        </li>
+      </ul>
+    </section>
+
     <section class="transfer-section" aria-labelledby="moment-filter-transfer-title">
       <div>
         <h2 id="moment-filter-transfer-title">
@@ -271,7 +347,7 @@ function confirmImport(): void {
       </div>
     </section>
 
-    <p v-if="recoveredSettings" class="warning-message" role="status">
+    <p v-if="recoveredSettings || recoveredPromotion" class="warning-message" role="status">
       {{ $t('settings.moment_filter_recovered') }}
     </p>
     <p v-if="errorMessage" class="error-message" role="alert">
@@ -282,7 +358,8 @@ function confirmImport(): void {
 
 <style scoped>
 .moments-settings,
-.rules-section {
+.rules-section,
+.learning-section {
   display: flex;
   min-width: 0;
   flex-direction: column;
@@ -290,6 +367,7 @@ function confirmImport(): void {
 }
 
 .rules-section,
+.learning-section,
 .transfer-section,
 .import-preview {
   padding: 16px;
@@ -317,10 +395,36 @@ p {
 }
 
 .section-header p,
+.learning-section p,
 .transfer-section p {
   margin-top: 4px;
   color: var(--bew-text-2);
   font-size: 13px;
+}
+
+.learning-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+}
+
+.learning-item {
+  display: flex;
+  min-width: 0;
+  padding: 10px;
+  border-radius: var(--bew-radius);
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bew-fill-1);
+}
+
+.learning-item p,
+.learning-empty {
+  overflow-wrap: anywhere;
 }
 
 .mode-control {
