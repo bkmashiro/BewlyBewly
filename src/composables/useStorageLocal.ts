@@ -20,6 +20,8 @@ const storageLocal: StorageLikeAsync = {
 
   async getItem(key: string) {
     const value = (await storage.local.get(key))[key]
+    // These keys have been owned by VueUse since their introduction and are
+    // stored as JSON strings; raw values are foreign/corrupt, not legacy data.
     return typeof value === 'string' ? value : null
   },
 }

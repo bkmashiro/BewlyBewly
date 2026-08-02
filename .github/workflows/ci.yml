@@ -82,7 +82,6 @@ jobs:
 
       - name: Build Extension-Safari
         if: ${{ matrix.os == 'macos-latest' }}
-        continue-on-error: true
         run: pnpm build:safari
 
       - name: Verify manifest contracts

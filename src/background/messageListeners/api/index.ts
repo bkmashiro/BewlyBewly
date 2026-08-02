@@ -36,6 +36,8 @@ export const API_COLLECTION = {
 // Merge all API objects into one
 const FullAPI = Object.assign({}, ...API_COLLECTION)
 // Create a message listener for each API
+// webextension-polyfill converts Promise results to sendResponse + `true` on
+// Chromium, retaining the callback-compatible message channel on older hosts.
 const handleMessage = apiListenerFactory(FullAPI)
 
 export function setupApiMsgLstnrs() {
