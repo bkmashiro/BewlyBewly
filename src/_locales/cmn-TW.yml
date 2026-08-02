@@ -299,6 +299,49 @@ settings:
   safari_helpers_desc3: 幫解答註冊蘋果開發者問題
   safari_helpers_desc4: 幫解答註冊蘋果開發者問題
 
+  # 原版動態過濾
+  menu_moments_filter: 動態過濾
+  moment_filter_title: 原版動態過濾
+  moment_filter_enabled: 啓用 DOM 過濾
+  moment_filter_enabled_desc: 只過濾 t.bilibili.com 原版頁面中已呈現的卡片，不重寫頁面，也不攔截網路請求。
+  moment_filter_mode: 隱藏規則組合方式
+  moment_filter_mode_desc: 白名單規則永遠優先；此處決定已啓用的隱藏規則如何組合。
+  moment_filter_mode_any: 符合任一隱藏規則
+  moment_filter_mode_all: 符合全部隱藏規則
+  moment_filter_rules: 規則
+  moment_filter_rules_desc: 規則只讀取卡片中已呈現的文字和中繼資料。
+  moment_filter_empty: 尚未有規則。新增一條規則即可開始過濾。
+  moment_filter_action: 動作
+  moment_filter_action_hide: 隱藏
+  moment_filter_action_allow: 放行
+  moment_filter_field: 欄位
+  moment_filter_field_authorUid: UP 主 UID
+  moment_filter_field_authorName: UP 主名稱
+  moment_filter_field_content: 動態內容
+  moment_filter_field_dynamicType: 動態類型
+  moment_filter_field_commercialSignal: 推廣訊號
+  moment_filter_operator: 條件
+  moment_filter_operator_equals: 等於
+  moment_filter_operator_contains: 包含
+  moment_filter_operator_regex: 正規表示式
+  moment_filter_operator_in: 位於清單中
+  moment_filter_value: 值
+  moment_filter_value_list_hint: 每行一個值，也可用逗號分隔
+  moment_filter_note: 備註
+  moment_filter_rule_enabled: 已啓用
+  moment_filter_case_sensitive: 區分大小寫
+  moment_filter_delete_confirm: 刪除這條動態過濾規則嗎？
+  moment_filter_import_export: 匯入與匯出
+  moment_filter_import_export_desc: 只傳輸版本化規則設定；不會匯出動態內容或帳號資料。
+  moment_filter_import_mode: 匯入方式
+  moment_filter_import_merge: 依規則 ID 合併
+  moment_filter_import_replace: 取代全部規則
+  moment_filter_import: 匯入 JSON
+  moment_filter_export: 匯出 JSON
+  moment_filter_import_preview: 匯入預覽
+  moment_filter_import_counts: '新增 {added} 條，更新 {updated} 條，未變更 {unchanged} 條，移除 {removed} 條。'
+  moment_filter_recovered: 偵測到無效的動態過濾儲存資料，已忽略並恢復安全預設值。
+
   contributors: 貢獻者
 
 auth:

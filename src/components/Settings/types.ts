@@ -10,6 +10,7 @@ export enum MenuType {
 
 export enum BewlyPage {
   Home = 'Home',
+  Moments = 'Moments',
   Search = 'Search',
 }
 

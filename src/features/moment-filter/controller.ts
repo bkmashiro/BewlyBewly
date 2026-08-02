@@ -1,10 +1,14 @@
+import type { MomentQuickActionLabels } from './quick-actions'
 import type {
+  MomentFilterCandidate,
   MomentFilterMatchResult,
   MomentFilterSettingsV1,
   MomentFilterStorage,
+  MomentRuleAction,
 } from './types'
 import { extractMomentCandidate, fingerprintMomentCandidate } from './extract'
 import { compileMomentFilter } from './matcher'
+import { createMomentQuickActionManager } from './quick-actions'
 import {
   MOMENT_CARD_SELECTOR,
   MOMENT_LIST_SELECTOR,
@@ -30,6 +34,10 @@ export interface MomentFilterControllerOptions {
   createObserver?: (callback: MutationCallback) => MutationObserver
   getHref?: () => string
   onDiagnostic?: (message: string) => void
+  quickActions?: {
+    labels: MomentQuickActionLabels
+    onAction: (candidate: MomentFilterCandidate, action: MomentRuleAction) => Promise<void>
+  }
 }
 
 function asElement(node: Node): Element | null {
@@ -74,6 +82,9 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
     getHref = () => window.location.href,
     onDiagnostic = () => {},
   } = options
+  const quickActionManager = options.quickActions
+    ? createMomentQuickActionManager(options.quickActions.labels, options.quickActions.onAction)
+    : undefined
 
   let disposed = false
   let active = false
@@ -126,6 +137,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
       if (seenFingerprints.get(card) === fingerprint)
         continue
       seenFingerprints.set(card, fingerprint)
+      quickActionManager?.ensure(card, candidate, fingerprint)
       evaluated += 1
       applyResult(card, match(candidate))
     }
@@ -217,7 +229,32 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
     if (!styleElement) {
       styleElement = document.createElement('style')
       styleElement.dataset.bewlyMomentFilter = 'true'
-      styleElement.textContent = `.${MOMENT_FILTER_HIDDEN_CLASS}{display:none!important}`
+      styleElement.textContent = `
+        .${MOMENT_FILTER_HIDDEN_CLASS} { display: none !important; }
+        .bewly-moment-filter-quick-action {
+          position: relative; display: inline-flex; margin-inline-start: 8px; vertical-align: middle;
+        }
+        .bewly-moment-filter-quick-action__trigger,
+        .bewly-moment-filter-quick-menu button {
+          border: 0; border-radius: 6px; color: inherit;
+          background: rgba(127, 127, 127, 0.14); cursor: pointer; font: inherit;
+        }
+        .bewly-moment-filter-quick-action__trigger { width: 24px; height: 24px; opacity: 0.55; }
+        .bewly-moment-filter-quick-action__trigger:hover,
+        .bewly-moment-filter-quick-action__trigger:focus-visible {
+          opacity: 1; outline: 2px solid currentColor; outline-offset: 2px;
+        }
+        .bewly-moment-filter-quick-menu {
+          position: absolute; z-index: 1000; top: calc(100% + 4px); left: 0;
+          display: flex; min-width: 150px; padding: 6px; gap: 4px; flex-direction: column;
+          border-radius: 8px; background: var(--bg1, #fff); box-shadow: 0 6px 24px rgba(0, 0, 0, 0.2);
+        }
+        .bewly-moment-filter-quick-menu[hidden] { display: none !important; }
+        .bewly-moment-filter-quick-menu button { padding: 6px 8px; white-space: nowrap; }
+        .bewly-moment-filter-quick-menu button:focus-visible {
+          outline: 2px solid currentColor; outline-offset: 1px;
+        }
+      `
       ;(document.head ?? document.documentElement).append(styleElement)
     }
     if (!rootObserver) {
@@ -242,6 +279,7 @@ export function createMomentFilterController(options: MomentFilterControllerOpti
     pendingCards.clear()
     batchScheduled = false
     seenFingerprints = new WeakMap<Element, string>()
+    quickActionManager?.cleanup()
     restoreAllCards()
     styleElement?.remove()
     styleElement = undefined

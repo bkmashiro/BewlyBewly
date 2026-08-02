@@ -1,4 +1,5 @@
 import antfu from '@antfu/eslint-config'
+import vuejsAccessibility from 'eslint-plugin-vuejs-accessibility'
 
 export default antfu(
   {
@@ -33,5 +34,12 @@ export default antfu(
         '.wxt',
       ],
     },
+  },
+  {
+    files: ['src/components/Settings/BewlyPages/Moments/**/*.vue'],
+    plugins: {
+      'vuejs-accessibility': vuejsAccessibility,
+    },
+    rules: vuejsAccessibility.configs['flat/recommended'][1].rules,
   },
 )

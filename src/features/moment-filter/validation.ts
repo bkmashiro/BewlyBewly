@@ -36,6 +36,10 @@ const OPERATORS_BY_FIELD: Record<MomentRuleField, readonly MomentRuleOperator[]>
   commercialSignal: ['equals', 'in'],
 }
 
+export function allowedMomentRuleOperators(field: MomentRuleField): readonly MomentRuleOperator[] {
+  return OPERATORS_BY_FIELD[field]
+}
+
 export class MomentFilterSettingsValidationError extends Error {
   constructor(readonly issues: MomentFilterValidationIssue[]) {
     super(issues.map(issue => `${issue.path}: ${issue.message}`).join('; '))

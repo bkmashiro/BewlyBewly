@@ -298,6 +298,49 @@ settings:
   safari_helpers_desc3: 帮解答注册苹果开发者问题
   safari_helpers_desc4: 帮解答注册苹果开发者问题
 
+  # 原版动态过滤
+  menu_moments_filter: 动态过滤
+  moment_filter_title: 原版动态过滤
+  moment_filter_enabled: 启用 DOM 过滤
+  moment_filter_enabled_desc: 只过滤 t.bilibili.com 原版页面中已渲染的卡片，不重写页面，也不拦截网络请求。
+  moment_filter_mode: 隐藏规则组合方式
+  moment_filter_mode_desc: 白名单规则始终优先；这里决定已启用的隐藏规则如何组合。
+  moment_filter_mode_any: 命中任一隐藏规则
+  moment_filter_mode_all: 命中全部隐藏规则
+  moment_filter_rules: 规则
+  moment_filter_rules_desc: 规则只读取卡片中已经渲染的文字和元数据。
+  moment_filter_empty: 还没有规则。添加一条规则即可开始过滤。
+  moment_filter_action: 动作
+  moment_filter_action_hide: 隐藏
+  moment_filter_action_allow: 放行
+  moment_filter_field: 字段
+  moment_filter_field_authorUid: UP 主 UID
+  moment_filter_field_authorName: UP 主名称
+  moment_filter_field_content: 动态内容
+  moment_filter_field_dynamicType: 动态类型
+  moment_filter_field_commercialSignal: 推广信号
+  moment_filter_operator: 条件
+  moment_filter_operator_equals: 等于
+  moment_filter_operator_contains: 包含
+  moment_filter_operator_regex: 正则表达式
+  moment_filter_operator_in: 位于列表中
+  moment_filter_value: 值
+  moment_filter_value_list_hint: 每行一个值，也可用逗号分隔
+  moment_filter_note: 备注
+  moment_filter_rule_enabled: 已启用
+  moment_filter_case_sensitive: 区分大小写
+  moment_filter_delete_confirm: 删除这条动态过滤规则吗？
+  moment_filter_import_export: 导入与导出
+  moment_filter_import_export_desc: 只传输版本化规则配置；不会导出动态内容或账号数据。
+  moment_filter_import_mode: 导入方式
+  moment_filter_import_merge: 按规则 ID 合并
+  moment_filter_import_replace: 替换全部规则
+  moment_filter_import: 导入 JSON
+  moment_filter_export: 导出 JSON
+  moment_filter_import_preview: 导入预览
+  moment_filter_import_counts: '新增 {added} 条，更新 {updated} 条，未变化 {unchanged} 条，移除 {removed} 条。'
+  moment_filter_recovered: 检测到无效的动态过滤存储数据，已忽略并恢复安全默认值。
+
   contributors: 贡献者
 
 auth:

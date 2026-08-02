@@ -303,6 +303,49 @@ settings:
   safari_helpers_desc3: Help answer Apple developer registration questions
   safari_helpers_desc4: Help answer Apple developer registration questions
 
+  # Original Moments filter
+  menu_moments_filter: Moments Filter
+  moment_filter_title: Original Moments Filter
+  moment_filter_enabled: Enable DOM filtering
+  moment_filter_enabled_desc: Filters cards on the original t.bilibili.com page without rewriting the page or intercepting network requests.
+  moment_filter_mode: Hide-rule matching
+  moment_filter_mode_desc: Allow rules always take priority. Choose how enabled hide rules are combined.
+  moment_filter_mode_any: Match any hide rule
+  moment_filter_mode_all: Match all hide rules
+  moment_filter_rules: Rules
+  moment_filter_rules_desc: Rules only use text and metadata already present in each rendered card.
+  moment_filter_empty: No rules yet. Add one to start filtering.
+  moment_filter_action: Action
+  moment_filter_action_hide: Hide
+  moment_filter_action_allow: Allow
+  moment_filter_field: Field
+  moment_filter_field_authorUid: Author UID
+  moment_filter_field_authorName: Author name
+  moment_filter_field_content: Content
+  moment_filter_field_dynamicType: Moment type
+  moment_filter_field_commercialSignal: Promotion signal
+  moment_filter_operator: Operator
+  moment_filter_operator_equals: Equals
+  moment_filter_operator_contains: Contains
+  moment_filter_operator_regex: Regular expression
+  moment_filter_operator_in: Is in list
+  moment_filter_value: Value
+  moment_filter_value_list_hint: One value per line or separate values with commas
+  moment_filter_note: Note
+  moment_filter_rule_enabled: Enabled
+  moment_filter_case_sensitive: Case-sensitive
+  moment_filter_delete_confirm: Delete this moment filter rule?
+  moment_filter_import_export: Import and export
+  moment_filter_import_export_desc: Only the versioned rule configuration is transferred; card content and account data are never exported.
+  moment_filter_import_mode: Import mode
+  moment_filter_import_merge: Merge by rule ID
+  moment_filter_import_replace: Replace all rules
+  moment_filter_import: Import JSON
+  moment_filter_export: Export JSON
+  moment_filter_import_preview: Import preview
+  moment_filter_import_counts: 'Added {added}, updated {updated}, unchanged {unchanged}, removed {removed}.'
+  moment_filter_recovered: Invalid stored moment-filter data was ignored and safe defaults were restored.
+
   contributors: Contributors
 
 auth:
