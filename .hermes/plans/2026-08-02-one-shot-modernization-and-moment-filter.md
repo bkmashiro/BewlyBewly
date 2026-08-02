@@ -489,3 +489,12 @@ pnpm zip:firefox
 
 - 本机没有 Firefox.app，因此未伪报 Firefox runtime smoke；Firefox 以 MV3 build、manifest contract、archive integrity 和 `web-ext lint` 覆盖。
 - 隔离 Chromium profile 未使用任何用户凭据，因此真实 smoke 为公开动态页；登录态无限滚动和 BFCache 行为由脱敏 fixture 与 MutationObserver/route/page lifecycle 测试覆盖。
+
+### 9.6 Chrome-only post-audit hardening
+
+- 提交 `4b8d4226` 修复首页标题/作者规则热更新及非法正则 fail-open，并补齐动态页 `data-mid` UID、完整正文和当前 `.forward` DOM 结构提取。
+- 主控补充并验证转发动态内嵌 video/link/opus 时仍以外层 `forward` 为准；有效 author href 优先于冲突的 `data-mid`；关注作者豁免语义保持不变。
+- 实时未登录 `t.bilibili.com` 页面验证当前卡片确实使用 `data-mid` 且存在 `.bili-dyn-content__orig`。
+- Chrome-only 最终 gate：59 项单测、5 项 manifest contract、typecheck、lint、Knip 和 Chrome MV3 build 全部通过。
+- 最新 Chrome 归档：`.output/bewly-bewly-0.41.1-chrome.zip`，16,141,285 bytes，SHA-256 `a93a4f38f1cc07034b41ca2d892775e3c5e6b171676b41ff3096357492fae7fb`，并通过 `unzip -tq`。
+- 依用户要求，本轮未刷新 Firefox 或 sources 归档；9.4 记录保留为此前跨浏览器验收快照。
