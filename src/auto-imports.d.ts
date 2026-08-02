@@ -6,6 +6,7 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const FilterType: typeof import('./composables/useFilter')['FilterType']
   const browser: typeof import('webextension-polyfill')
   const computed: typeof import('vue')['computed']
   const createApp: typeof import('vue')['createApp']
@@ -51,9 +52,14 @@ declare global {
   const triggerRef: typeof import('vue')['triggerRef']
   const unref: typeof import('vue')['unref']
   const useAttrs: typeof import('vue')['useAttrs']
+  const useBewlyApp: typeof import('./composables/useAppProvider')['useBewlyApp']
   const useCssModule: typeof import('vue')['useCssModule']
   const useCssVars: typeof import('vue')['useCssVars']
+  const useDark: typeof import('./composables/useDark')['useDark']
+  const useDelayedHover: typeof import('./composables/useDelayedHover')['useDelayedHover']
+  const useFilter: typeof import('./composables/useFilter')['useFilter']
   const useSlots: typeof import('vue')['useSlots']
+  const useStorageLocal: typeof import('./composables/useStorageLocal')['useStorageLocal']
   const watch: typeof import('vue')['watch']
   const watchEffect: typeof import('vue')['watchEffect']
   const watchPostEffect: typeof import('vue')['watchPostEffect']

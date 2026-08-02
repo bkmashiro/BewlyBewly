@@ -69,8 +69,7 @@ function apiListenerFactory(API_MAP: APIMAP) {
 
     const api = API_MAP[contentScriptQuery] as API
 
-    // eslint-disable-next-line node/prefer-global/process
-    if (process.env.FIREFOX && sender && sender.tab && sender.tab.cookieStoreId) {
+    if (import.meta.env.BROWSER === 'firefox' && sender && sender.tab && sender.tab.cookieStoreId) {
       const cookies = await browser.cookies.getAll({ storeId: sender.tab.cookieStoreId })
       return doRequest(message, api, sendResponse, cookies)
     }

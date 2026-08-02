@@ -24,11 +24,8 @@ pnpm install
 # 建立一個用家帳戶資料夾，用於延伸功能存儲登入狀態
 mkdir web-ext-profile
 
-# 運行專案
-pnpm dev
-
 # 打完呢條指令之後，會自動開啓一個新嘅 Chrome 視窗並且打開 BiliBili 網站
-pnpm start:chromium
+pnpm dev
 ```
 
 2. 之後每次修改延伸功能，佢會重新載入，你可以 refresh 個網頁睇吓改變之後嘅效果
@@ -58,7 +55,7 @@ pnpm dev
 <br/>
 <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
 
-4. 喺瀏覽器度載入產生嘅 `extension/` 資料夾
+4. 喺瀏覽器度載入產生嘅 `.output/chrome-mv3/` 資料夾
 
 每一次執過 code 之後，你都要撳 [Extensions Reloader](https://chromewebstore.google.com/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid) 粒掣，然之後 refresh 個 page，確保係有效果。
 
@@ -72,7 +69,7 @@ pnpm dev
 pnpm build
 ```
 
-然之後打包 `extension` 下嘅檔案
+然之後執行 `pnpm zip` 打包，產生嘅壓縮檔喺 `.output/` 入邊
 
 ### 開發（Firefox）
 
@@ -90,11 +87,8 @@ pnpm install
 # 建立一個用家帳戶資料夾，用於延伸功能存儲登入狀態
 mkdir web-ext-profile
 
-# 運行專案
-pnpm dev
-
 # 打完呢條指令之後，會自動開啓一個新嘅 Firefox 視窗並且打開 BiliBili 網站
-pnpm start:firefox
+pnpm dev:firefox
 ```
 
 2. 之後每次修改延伸功能，佢會重新載入，你可以 refresh 個網頁睇吓改變之後嘅效果
@@ -113,14 +107,14 @@ pnpm start:firefox
 pnpm install
 
 # 運行專案
-pnpm dev-firefox
+pnpm dev:firefox
 ```
 
 2. 喺瀏覽器度輸入 `about:addons`，撳 `Extensions` 然之後 `Debug Add-ons`
 
 <img width="655" alt="image" src="https://github.com/hakadao/BewlyBewly/assets/33394391/7c49e4ca-2a87-4c56-bc00-3259d6eba128">
 
-3. 喺瀏覽器度載入產生嘅 `extension-firefox/` 資料夾
+3. 喺瀏覽器度載入產生嘅 `.output/firefox-mv3/` 資料夾
 
 </details>
 
@@ -129,10 +123,10 @@ pnpm dev-firefox
 建置延伸功能，要執行下底嘅指令
 
 ```bash
-pnpm build-firefox
+pnpm build:firefox
 ```
 
-然之後打包 `extension-firefox` 下嘅檔案
+然之後執行 `pnpm zip:firefox` 打包，產生嘅壓縮檔喺 `.output/` 入邊
 
 ## 🤝 貢獻
 

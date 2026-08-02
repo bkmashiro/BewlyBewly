@@ -7,8 +7,7 @@ export default defineConfig({
   content: {
     pipeline: {
       include: [
-        '**/*.{js,ts}',
-        /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
+        'src/**/*.{html,js,ts,vue}',
       ],
     },
   },

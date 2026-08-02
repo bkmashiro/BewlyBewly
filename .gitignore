@@ -10,9 +10,8 @@
 *.zip
 dist
 dist-ssr
-extension/
-extension-firefox/
-extension-safari/
+.output/
+.wxt/
 node_modules
 web-ext-profile
 extension-safari-macos/

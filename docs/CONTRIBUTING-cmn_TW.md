@@ -24,11 +24,8 @@ pnpm install
 # 建立一個用戶的帳戶資料夾，用於擴充功能存儲登入狀態
 mkdir web-ext-profile
 
-# 運行專案
-pnpm dev
-
 # 打完這條指令之後，會自動開啓一個新的 Chrome 視窗並打開 BiliBili 網站
-pnpm start:chromium
+pnpm dev
 ```
 
 2. 之後每次修改擴充功能，他都會重新載入內容，你可以透過重新整理頁面來查看變更內容
@@ -58,7 +55,7 @@ pnpm dev
 <br/>
 <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
 
-4. 在瀏覽器中載入生成的 `extension/` 資料夾
+4. 在瀏覽器中載入生成的 `.output/chrome-mv3/` 資料夾
 
 每次修改後，您需要點選 [Extensions Reloader](https://chromewebstore.google.com/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid) 按鈕，然後重新整理頁面，以確保更改生效。
 
@@ -72,7 +69,7 @@ pnpm dev
 pnpm build
 ```
 
-然後打包 `extension` 下的檔案
+然後執行 `pnpm zip` 打包，產生的壓縮檔位於 `.output/`
 
 ### 開發（Firefox）
 
@@ -90,11 +87,8 @@ pnpm install
 # 建立一個用戶的帳戶資料夾，用於擴充功能存儲登入狀態
 mkdir web-ext-profile
 
-# 運行專案
-pnpm dev
-
 # 打完這條指令之後，會自動開啓一個新的 Firefox 視窗並打開 BiliBili 網站
-pnpm start:firefox
+pnpm dev:firefox
 ```
 
 2. 之後每次修改擴充功能，它都會重新加載，你可以透過重新整理頁面來查看變更內容
@@ -113,14 +107,14 @@ pnpm start:firefox
 pnpm install
 
 # 運行專案
-pnpm dev-firefox
+pnpm dev:firefox
 ```
 
 2. 在瀏覽器中輸入 `about:addons`，點擊 `Extensions` 然後 `Debug Add-ons`
 
 <img width="655" alt="image" src="https://github.com/hakadao/BewlyBewly/assets/33394391/7c49e4ca-2a87-4c56-bc00-3259d6eba128">
 
-3. 然後在瀏覽器中使用 `extension-firefox/` 資料夾載入此擴充功能。
+3. 然後在瀏覽器中使用 `.output/firefox-mv3/` 資料夾載入此擴充功能。
 
 </details>
 
@@ -129,10 +123,10 @@ pnpm dev-firefox
 要構建擴展，運行
 
 ```bash
-pnpm build-firefox
+pnpm build:firefox
 ```
 
-然後打包 `extension-firefox` 下的檔案
+然後執行 `pnpm zip:firefox` 打包，產生的壓縮檔位於 `.output/`
 
 ## 🤝 貢獻
 

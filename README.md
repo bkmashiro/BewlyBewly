@@ -66,17 +66,17 @@ Without this template, it may not be possible to develop this project.
 
 #### Edge & Chrome (RECOMMENDED)
 
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) .
+> Ensure you installed [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases) .
 
 Opening the `edge://extensions` page in the Edge or `chrome://extensions` page in Chrome,
-simply drag and drop the downloaded `extension.zip` file into the browser to complete the installation.
+simply drag and drop the downloaded `bewly-bewly-<version>-chrome.zip` file into the browser to complete the installation.
 
 <details>
  <summary> Another installation method for Edge & Chrome </summary>
 
 #### Edge
 
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
+> Ensure you installed [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
 
 1. Type in `edge://extensions/` in the address bar and press Enter
 2. Turn on `Developer mode` then press `Load Unpacked` <br/> <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
@@ -84,7 +84,7 @@ simply drag and drop the downloaded `extension.zip` file into the browser to com
 
 #### Chrome
 >
-> Ensure you installed [extension.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
+> Ensure you installed [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases) and decompress this file.
 
 1. Type in `chrome://extensions/` in the address bar and press Enter
 2. Turn on `Developer mode` then press `Load Unpacked` <br/> <img width="655" alt="Snipaste_2022-03-27_18-17-04" src="https://user-images.githubusercontent.com/33394391/160276882-13da0484-92c1-47dd-add8-7655c5c2bf1c.png">

@@ -1,19 +1,21 @@
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
+  "paths": {
+    "~/*": ["src/*"]
+  },
   "entry": [
-    "src/contentScripts/index.ts",
-    "src/background/index.ts",
-    "src/options/main.ts",
-    "src/popup/main.ts",
+    "src/entrypoints/**/*.ts",
     "src/components/**",
-    "scripts/*.ts",
     "*.config.*"
   ],
-  "ignore": ["src/components/Settings/**", "src/inject/**"],
+  "ignore": ["src/components/Settings/**"],
   "ignoreDependencies": [
     "@iconify/json",
+    "esbuild",
     "uno.css",
-    "lint-staged"
+    "lint-staged",
+    "sass",
+    "terser"
   ],
   "ignoreBinaries": ["gh", "xcrun"],
   "rules": {

@@ -24,11 +24,8 @@ pnpm install
 # Create a profile folder for the extension to store the login status
 mkdir web-ext-profile
 
-# Run the project
-pnpm dev
-
 # After typing this commend, it will automatically open a new Chrome window that opens BiliBili website
-pnpm start:chromium
+pnpm dev
 ```
 
 2. Every time you change the extension, it will reload, and you can see the changes by refreshing the webpage
@@ -58,7 +55,7 @@ pnpm dev
 <br/>
 <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
 
-4. Load the generated `extension/` folder in the browser
+4. Load the generated `.output/chrome-mv3/` folder in the browser
 
 After each modification, you need to click the [Reload Extensions](https://chromewebstore.google.com/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid) button and refresh the page to apply the changes.
 
@@ -72,7 +69,7 @@ To build the extension, run
 pnpm build
 ```
 
-Then package it to the `extension` folder
+Then package it with `pnpm zip`; the resulting archive is under `.output/`
 
 ### Development (Firefox)
 
@@ -90,11 +87,8 @@ pnpm install
 # Create a profile folder for the extension to store the login status
 mkdir web-ext-profile
 
-# Run the project
-pnpm dev
-
 # After typing this commend, it will automatically open a new Firefox window that opens BiliBili website
-pnpm start:firefox
+pnpm dev:firefox
 ```
 
 2. Every time you change the extension, it will reload, and you can see the changes by refreshing the webpage
@@ -113,14 +107,14 @@ pnpm start:firefox
 pnpm install
 
 # Run the project
-pnpm dev-firefox
+pnpm dev:firefox
 ```
 
 2. In the browser, enter `about:addons`, click on `Extensions` and then `Debug Add-ons`
 
 <img width="655" alt="image" src="https://github.com/hakadao/BewlyBewly/assets/33394391/7c49e4ca-2a87-4c56-bc00-3259d6eba128">
 
-3. Load the generated `extension-firefox/` folder in the browser
+3. Load the generated `.output/firefox-mv3/` folder in the browser
 
 </details>
 
@@ -129,10 +123,10 @@ pnpm dev-firefox
 To build the extension, run
 
 ```bash
-pnpm build-firefox
+pnpm build:firefox
 ```
 
-Then package it to the `extension-firefox` folder
+Then package it with `pnpm zip:firefox`; the resulting archive is under `.output/`
 
 ## 🤝 Contribution
 

@@ -210,8 +210,10 @@ function toggleTabContentLoading(loading: boolean) {
             class="home-tabs-inside"
             element="div" defer
             :options="{
-              x: 'scroll',
-              y: 'hidden',
+              overflow: {
+                x: 'scroll',
+                y: 'hidden',
+              },
             }"
             h-full of-hidden
           >

@@ -25,11 +25,8 @@ pnpm install
 # 创建一个用于存储登录状态的扩展程序文件夹
 mkdir web-ext-profile
 
-# 运行项目
-pnpm dev
-
 # 打完这条指令之后，会自动打开一个新的 Chrome 窗口并打开 BiliBili 网站
-pnpm start:chromium
+pnpm dev
 ```
 
 2. 每次修改扩展程序，它都会重新加载，您可以通过刷新网页来查看更改
@@ -59,7 +56,7 @@ pnpm start:chromium
 <br/>
 <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
 
-4. 在浏览器中加载生成的 `extension/` 文件夹
+4. 在浏览器中加载生成的 `.output/chrome-mv3/` 文件夹
 
 每次修改后，您需要单击 [Reload Extensions](https://chromewebstore.google.com/detail/extensions-reloader/fimgfedafeadlieiabdeeaodndnlbhid) 按钮并刷新页面以确保应用更改。
 
@@ -73,7 +70,7 @@ pnpm start:chromium
 pnpm build
 ```
 
-然后打包到 `extension` 文件夹
+然后运行 `pnpm zip` 打包，生成的压缩包位于 `.output/`
 
 ### 开发 (Firefox)
 
@@ -91,11 +88,8 @@ pnpm install
 # 创建一个用于存储登录状态的扩展程序文件夹
 mkdir web-ext-profile
 
-# 运行项目
-pnpm dev
-
 # 打完这条指令之后，会自动打开一个新的 Firefox 窗口并打开 BiliBili 网站
-pnpm start:firefox
+pnpm dev:firefox
 ```
 
 2. 每次修改扩展程序，它都会重新加载，您可以通过刷新网页来查看更改
@@ -114,14 +108,14 @@ pnpm start:firefox
 pnpm install
 
 # 运行项目
-pnpm dev-firefox
+pnpm dev:firefox
 ```
 
 2. 在浏览器输入 `about:addons` 之后点击 `Extensions` 然后 `Debug Add-ons`
 
 <img width="655" alt="image" src="https://github.com/hakadao/BewlyBewly/assets/33394391/7c49e4ca-2a87-4c56-bc00-3259d6eba128">
 
-3. 在浏览器中加载生成的 `extension-firefox/` 文件夹
+3. 在浏览器中加载生成的 `.output/firefox-mv3/` 文件夹
 
 </details>
 
@@ -131,11 +125,11 @@ pnpm dev-firefox
 
 ```bash
 
-pnpm build-firefox
+pnpm build:firefox
 
 ```
 
-然后打包到 `extension-firefox` 文件夹
+然后运行 `pnpm zip:firefox` 打包，生成的压缩包位于 `.output/`
 
 ## 🤝 贡献
 

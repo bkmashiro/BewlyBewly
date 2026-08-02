@@ -1,7 +1,8 @@
 import '~/styles'
 import 'uno.css'
 
-import { createApp } from 'vue'
+import type { App as VueApp, EffectScope } from 'vue'
+import { createApp, effectScope } from 'vue'
 
 import { useDark } from '~/composables/useDark'
 import { BEWLY_MOUNTED } from '~/constants/globalEvents'
@@ -17,19 +18,6 @@ import App from './views/App.vue'
 
 const isFirefox: boolean = /Firefox/i.test(navigator.userAgent)
 
-// Fix `OverlayScrollbars` not working in Firefox
-// https://github.com/fingerprintjs/fingerprintjs/issues/683#issuecomment-881210244
-if (isFirefox) {
-  window.requestIdleCallback = window.requestIdleCallback.bind(window)
-  window.cancelIdleCallback = window.cancelIdleCallback.bind(window)
-  window.requestAnimationFrame = window.requestAnimationFrame.bind(window)
-  window.cancelAnimationFrame = window.cancelAnimationFrame.bind(window)
-  window.setTimeout = window.setTimeout.bind(window)
-  window.clearTimeout = window.clearTimeout.bind(window)
-}
-
-const currentUrl = document.URL
-
 function isSupportedPages(): boolean {
   if (isInIframe())
     return false
@@ -39,44 +27,44 @@ function isSupportedPages(): boolean {
     // video or bangumi page
     || isVideoOrBangumiPage()
     // popular page https://www.bilibili.com/v/popular/all
-    || /https?:\/\/(?:www\.)?bilibili\.com\/v\/popular\/all.*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/v\/popular\/all.*/.test(document.URL)
     // search page
-    || /https?:\/\/search\.bilibili\.com\.*/.test(currentUrl)
+    || /https?:\/\/search\.bilibili\.com\.*/.test(document.URL)
     // moments page
     // https://github.com/BewlyBewly/BewlyBewly/issues/1246
     // https://github.com/BewlyBewly/BewlyBewly/issues/1256
     // https://github.com/BewlyBewly/BewlyBewly/issues/1266
-    || /https?:\/\/t\.bilibili\.com(?!\/vote|\/share).*/.test(currentUrl)
+    || /https?:\/\/t\.bilibili\.com(?!\/vote|\/share).*/.test(document.URL)
     // moment detail
-    || /https?:\/\/(?:www\.)?bilibili\.com\/opus\/.*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/opus\/.*/.test(document.URL)
     // history page
-    || /https?:\/\/(?:www\.)?bilibili\.com\/history.*/.test(currentUrl)
-    || /https?:\/\/(?:www\.)?bilibili\.com\/account\/history.*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/history.*/.test(document.URL)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/account\/history.*/.test(document.URL)
     // watcher later page
-    || /https?:\/\/(?:www\.)?bilibili\.com\/watchlater\/#\/list.*/.test(currentUrl)
-    || /https?:\/\/(?:www\.)?bilibili\.com\/watchlater\/list.*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/watchlater\/#\/list.*/.test(document.URL)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/watchlater\/list.*/.test(document.URL)
     // user space page
-    || /https?:\/\/space\.bilibili\.com\.*/.test(currentUrl)
+    || /https?:\/\/space\.bilibili\.com\.*/.test(document.URL)
     // notifications page
-    || /https?:\/\/message\.bilibili\.com\.*/.test(currentUrl)
+    || /https?:\/\/message\.bilibili\.com\.*/.test(document.URL)
     // bilibili channel page b站分区页面
-    || /https?:\/\/(?:www\.)?bilibili\.com\/v\/(?!popular).*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/v\/(?!popular).*/.test(document.URL)
     // anime page & chinese anime page
-    || /https?:\/\/(?:www\.)?bilibili\.com\/(?:anime|guochuang).*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/(?:anime|guochuang).*/.test(document.URL)
     // channel page e.g. tv shows, movie, variety shows, mooc page
-    || /https?:\/\/(?:www\.)?bilibili\.com\/(?:tv|movie|variety|mooc|documentary).*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/(?:tv|movie|variety|mooc|documentary).*/.test(document.URL)
     // article page
-    || /https?:\/\/(?:www\.)?bilibili\.com\/read\/.*/.test(currentUrl)
+    || /https?:\/\/(?:www\.)?bilibili\.com\/read\/.*/.test(document.URL)
     // 404 page
-    || /^https?:\/\/(?:www\.)?bilibili\.com\/404.*$/.test(currentUrl)
+    || /^https?:\/\/(?:www\.)?bilibili\.com\/404.*$/.test(document.URL)
     // creative center page 創作中心頁
-    || /^https?:\/\/member\.bilibili\.com\/platform.*$/.test(currentUrl)
+    || /^https?:\/\/member\.bilibili\.com\/platform.*$/.test(document.URL)
     // account settings page 帳號設定頁
-    || /^https?:\/\/account\.bilibili\.com\/.*$/.test(currentUrl)
+    || /^https?:\/\/account\.bilibili\.com\/.*$/.test(document.URL)
     // login page
-    || /^https?:\/\/passport\.bilibili\.com\/login.*$/.test(currentUrl)
+    || /^https?:\/\/passport\.bilibili\.com\/login.*$/.test(document.URL)
     // music center page 新歌熱榜 https://music.bilibili.com/pc/music-center/
-    || /https?:\/\/music\.bilibili\.com\/pc\/music-center.*$/.test(currentUrl)
+    || /https?:\/\/music\.bilibili\.com\/pc\/music-center.*$/.test(document.URL)
   ) {
     return true
   }
@@ -93,17 +81,17 @@ export function isSupportedIframePages(): boolean {
       isHomePage()
       // Since `Open in drawer` will open the video page within an iframe, so we need to support the following pages
       || isVideoOrBangumiPage()
-      || /https?:\/\/search\.bilibili\.com\/all.*/.test(currentUrl)
-      || /https?:\/\/www\.bilibili\.com\/anime.*/.test(currentUrl)
-      || /https?:\/\/space\.bilibili\.com\/\d+\/favlist.*/.test(currentUrl)
-      || /https?:\/\/www\.bilibili\.com\/history.*/.test(currentUrl)
-      || /https?:\/\/www\.bilibili\.com\/watchlater\/#\/list.*/.test(currentUrl)
-      || /https?:\/\/www\.bilibili\.com\/watchlater\/list.*/.test(currentUrl)
+      || /https?:\/\/search\.bilibili\.com\/all.*/.test(document.URL)
+      || /https?:\/\/www\.bilibili\.com\/anime.*/.test(document.URL)
+      || /https?:\/\/space\.bilibili\.com\/\d+\/favlist.*/.test(document.URL)
+      || /https?:\/\/www\.bilibili\.com\/history.*/.test(document.URL)
+      || /https?:\/\/www\.bilibili\.com\/watchlater\/#\/list.*/.test(document.URL)
+      || /https?:\/\/www\.bilibili\.com\/watchlater\/list.*/.test(document.URL)
       // moments page
       // https://github.com/BewlyBewly/BewlyBewly/issues/1246
       // https://github.com/BewlyBewly/BewlyBewly/issues/1256
       // https://github.com/BewlyBewly/BewlyBewly/issues/1266
-      || /https?:\/\/t\.bilibili\.com(?!\/vote|\/share).*/.test(currentUrl)
+      || /https?:\/\/t\.bilibili\.com(?!\/vote|\/share).*/.test(document.URL)
       // notifications page, for `Open the notifications page as a drawer`
       || isNotificationPage()
     )
@@ -116,57 +104,116 @@ export function isSupportedIframePages(): boolean {
 }
 
 let beforeLoadedStyleEl: HTMLStyleElement | undefined
+let removeOriginalTopBar: HTMLStyleElement | undefined
+let mountedApp: VueApp<Element> | undefined
+let mountedContainer: HTMLElement | undefined
+let transitionStyleEl: HTMLStyleElement | undefined
+let contentEffectScope: EffectScope | undefined
+let contentScriptStarted = false
 
-if (isSupportedPages() || isSupportedIframePages()) {
-  if (settings.value.adaptToOtherPageStyles)
-    useDark()
-
-  if (settings.value.adaptToOtherPageStyles) {
-    document.documentElement.classList.add('bewly-design')
-
-    // Remove the Bilibili Evolved's dark mode style
-    runWhenIdle(async () => {
-      const darkModeStyle = document.head.querySelector('#dark-mode')
-      if (darkModeStyle)
-        document.head.removeChild(darkModeStyle)
-    })
-  }
-
-  else {
-    document.documentElement.classList.remove('bewly-design')
-  }
-}
-
-if (settings.value.adaptToOtherPageStyles && isHomePage()) {
-  beforeLoadedStyleEl = injectCSS(`
-    html.bewly-design {
-      background-color: var(--bew-bg);
-      transition: background-color 0.2s ease-in;
-    }
-
-    body {
-      display: none;
-    }
-  `)
-
-  // Add opacity transition effect for page loaded
-  injectCSS(`
-    body {
-      transition: opacity 0.5s;
-    }
-  `)
-}
-
-window.addEventListener(BEWLY_MOUNTED, () => {
+function handleBewlyMounted() {
   if (beforeLoadedStyleEl)
-    document.documentElement.removeChild(beforeLoadedStyleEl)
-})
+    beforeLoadedStyleEl.remove()
+  beforeLoadedStyleEl = undefined
+}
 
-// Set the original Bilibili top bar to `display: none` to prevent it from showing before the load
-// see: https://github.com/BewlyBewly/BewlyBewly/issues/967
-const removeOriginalTopBar = injectCSS(`.bili-header, #biliMainHeader { visibility: hidden !important; }`)
+function handleDOMContentLoaded() {
+  void onDOMLoaded()
+}
+
+export function setupContentScript() {
+  if (contentScriptStarted)
+    return cleanupContentScript
+
+  contentScriptStarted = true
+
+  // Fix `OverlayScrollbars` not working in Firefox
+  // https://github.com/fingerprintjs/fingerprintjs/issues/683#issuecomment-881210244
+  if (isFirefox) {
+    window.requestIdleCallback = window.requestIdleCallback.bind(window)
+    window.cancelIdleCallback = window.cancelIdleCallback.bind(window)
+    window.requestAnimationFrame = window.requestAnimationFrame.bind(window)
+    window.cancelAnimationFrame = window.cancelAnimationFrame.bind(window)
+    window.setTimeout = window.setTimeout.bind(window)
+    window.clearTimeout = window.clearTimeout.bind(window)
+  }
+
+  if (isSupportedPages() || isSupportedIframePages()) {
+    if (settings.value.adaptToOtherPageStyles) {
+      contentEffectScope = effectScope()
+      contentEffectScope.run(() => useDark())
+    }
+
+    if (settings.value.adaptToOtherPageStyles) {
+      document.documentElement.classList.add('bewly-design')
+
+      runWhenIdle(async () => {
+        document.head.querySelector('#dark-mode')?.remove()
+      })
+    }
+    else {
+      document.documentElement.classList.remove('bewly-design')
+    }
+  }
+
+  if (settings.value.adaptToOtherPageStyles && isHomePage()) {
+    beforeLoadedStyleEl = injectCSS(`
+      html.bewly-design {
+        background-color: var(--bew-bg);
+        transition: background-color 0.2s ease-in;
+      }
+
+      body {
+        display: none;
+      }
+    `)
+
+    transitionStyleEl = injectCSS(`
+      body {
+        transition: opacity 0.5s;
+      }
+    `)
+  }
+
+  window.addEventListener(BEWLY_MOUNTED, handleBewlyMounted)
+
+  // Hide the original top bar until Bewly is ready.
+  removeOriginalTopBar = injectCSS(`.bili-header, #biliMainHeader { visibility: hidden !important; }`)
+
+  if (document.readyState !== 'loading')
+    void onDOMLoaded()
+  else
+    document.addEventListener('DOMContentLoaded', handleDOMContentLoaded)
+
+  return cleanupContentScript
+}
+
+export function cleanupContentScript() {
+  if (!contentScriptStarted)
+    return
+
+  contentScriptStarted = false
+  window.removeEventListener(BEWLY_MOUNTED, handleBewlyMounted)
+  document.removeEventListener('DOMContentLoaded', handleDOMContentLoaded)
+  beforeLoadedStyleEl?.remove()
+  transitionStyleEl?.remove()
+  removeOriginalTopBar?.remove()
+  contentEffectScope?.stop()
+  mountedApp?.unmount()
+  mountedContainer?.remove()
+  document.documentElement.classList.remove('bewly-design')
+  beforeLoadedStyleEl = undefined
+  transitionStyleEl = undefined
+  removeOriginalTopBar = undefined
+  contentEffectScope = undefined
+  mountedApp = undefined
+  mountedContainer = undefined
+}
 
 async function onDOMLoaded() {
+  if (!contentScriptStarted)
+    return
+
   let originalTopBar: HTMLElement | null = null
 
   const changeHomePage = !isInIframe() && !settings.value.useOriginalBilibiliHomepage && isHomePage()
@@ -208,19 +255,18 @@ async function onDOMLoaded() {
   }
 
   // Reset the original Bilibili top bar display style
-  if (removeOriginalTopBar)
-    document.documentElement.removeChild(removeOriginalTopBar)
+  removeOriginalTopBar?.remove()
+  removeOriginalTopBar = undefined
 }
-
-if (document.readyState !== 'loading')
-  onDOMLoaded()
-else
-  document.addEventListener('DOMContentLoaded', () => onDOMLoaded())
 
 function injectAppWhenIdle() {
   return new Promise<void>((resolve) => {
     // Inject app when idle
     runWhenIdle(async () => {
+      if (!contentScriptStarted) {
+        resolve()
+        return
+      }
       injectApp()
       resolve()
     })
@@ -228,6 +274,9 @@ function injectAppWhenIdle() {
 }
 
 function injectApp() {
+  if (!contentScriptStarted)
+    return
+
   // Remove bewly element if it already exists and the version is less than the current version
   // Only the development mode bewly element remains
   const bewlyElArr: NodeListOf<Element> = document.querySelectorAll('#bewly')
@@ -265,7 +314,7 @@ function injectApp() {
   const resetStyleEl = document.createElement('style')
   resetStyleEl.textContent = `${RESET_BEWLY_CSS}`
   styleEl.setAttribute('rel', 'stylesheet')
-  styleEl.setAttribute('href', browser.runtime.getURL('dist/contentScripts/style.css'))
+  styleEl.setAttribute('href', browser.runtime.getURL('/content-scripts/content.css'))
   shadowDOM.appendChild(resetStyleEl)
   shadowDOM.appendChild(styleEl)
   shadowDOM.appendChild(root)
@@ -286,8 +335,10 @@ function injectApp() {
   shadowDOM.appendChild(svgDiv)
 
   document.body.appendChild(container)
+  mountedContainer = container
 
   const app = createApp(App)
+  mountedApp = app
   setupApp(app)
   app.mount(root)
 }
@@ -306,7 +357,7 @@ function injectApp() {
 //     const styleEl = document.createElement('style')
 //     styleEl.setAttribute('data-bewly-style', 'true')
 //     styleEl.textContent = `
-//       @import url(${browser.runtime.getURL('dist/contentScripts/style.css')});
+//       @import url(${browser.runtime.getURL('/content-scripts/content.css')});
 //       ${settings.value.adaptToOtherPageStyles
 //       ? `
 //         * {

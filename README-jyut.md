@@ -62,16 +62,16 @@ BewlyBewly 係一個用於 BiliBili 嘅瀏覽器延伸功能，目的係透過�
 
 #### Edge 同 Chrome (推介)
 
-> 確保你單咗 [extension.zip](https://github.com/hakadao/BewlyBewly/releases)。
+> 確保你單咗 [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases)。
 
-喺 Edge 入邊打開 `edge://extensions` 頁面抑或喺 Chrome 度打開 `chrome://extensions` 頁面，淨係要你將單咗嘅 `extension.zip` 檔案擺到 browser 度，就攪掂喇。
+喺 Edge 入邊打開 `edge://extensions` 頁面抑或喺 Chrome 度打開 `chrome://extensions` 頁面，淨係要你將單咗嘅 `bewly-bewly-<version>-chrome.zip` 檔案擺到 browser 度，就攪掂喇。
 
 <details>
  <summary> Edge 同 Chrome 第種單撈方法 </summary>
 
 #### Edge
 
-> 確保你單咗 [extension.zip](https://github.com/hakadao/BewlyBewly/releases) 兼且解壓縮個檔案
+> 確保你單咗 [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases) 兼且解壓縮個檔案
 
 1. 喺地址欄入邊輸入 `edge://extensions/`，然之後撳 Enter
 2. 打開`開發者模式`，撳`載入解壓縮` <br/> <img width="655" alt="image" src="https://user-images.githubusercontent.com/33394391/232246901-e3544c16-bde2-480d-b770-ca5242793963.png">
@@ -79,7 +79,7 @@ BewlyBewly 係一個用於 BiliBili 嘅瀏覽器延伸功能，目的係透過�
 
 #### Chrome
 >
-> 確保你單咗 [extension.zip](https://github.com/hakadao/BewlyBewly/releases) 兼且解壓縮個檔案
+> 確保你單咗 [bewly-bewly-<version>-chrome.zip](https://github.com/hakadao/BewlyBewly/releases) 兼且解壓縮個檔案
 
 1. 在地址欄中輸入 `chrome://extensions/`，然後按下 Enter 鍵
 2. 打開`開發者模式`，撳`載入解壓縮` <br/> <img width="655" alt="Snipaste_2022-03-27_18-17-04" src="https://user-images.githubusercontent.com/33394391/160276882-13da0484-92c1-47dd-add8-7655c5c2bf1c.png">

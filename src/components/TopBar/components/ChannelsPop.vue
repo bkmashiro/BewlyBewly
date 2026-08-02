@@ -52,8 +52,10 @@ const otherLinks = computed(() => [
   <OverlayScrollbarsComponent
     element="div" defer
     :options="{
-      x: 'hidden',
-      y: 'scroll',
+      overflow: {
+        x: 'hidden',
+        y: 'scroll',
+      },
     }"
     style="backdrop-filter: var(--bew-filter-glass-1);"
     h="[calc(100vh-100px)]" max-h="445px"

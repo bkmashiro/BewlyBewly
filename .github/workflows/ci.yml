@@ -75,14 +75,17 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         with:
           name: BewlyBewly Zip
-          path: extension
+          path: .output/chrome-mv3
 
       - name: Build Extension-Firefox
-        run: pnpm build-firefox
+        run: pnpm build:firefox
+
+      - name: Verify manifest contracts
+        run: pnpm exec vitest run tests/manifest-contract.spec.ts
 
       - name: Upload Zip
         if: ${{ matrix.os == 'ubuntu-latest' && matrix.node == 'lts/*' && github.ref_name == 'main' }}
         uses: actions/upload-artifact@v4.3.1
         with:
           name: BewlyBewly-Firefox Zip
-          path: extension-firefox
+          path: .output/firefox-mv3
