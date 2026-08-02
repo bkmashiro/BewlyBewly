@@ -450,9 +450,3 @@ export function upsertPromotionSignature(
   signatures[index] = merged
   return { ...current, signatures }
 }
-
-export const normalizeKeywords = normalizePromotionKeywords
-export const normalizeDomains = normalizePromotionDomains
-export const suggestKeywords = suggestPromotionKeywords
-export const classifyPromotion = classifyPromotionCandidate
-export const upsertSignature = upsertPromotionSignature

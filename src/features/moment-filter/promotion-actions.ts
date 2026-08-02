@@ -11,13 +11,6 @@ export const MOMENT_PROMOTION_PANEL_CLASS = `${MOMENT_PROMOTION_ACTIONS_CLASS}__
 export const MOMENT_PROMOTION_COLLAPSED_CLASS = 'bewly-moment-promotion-collapsed'
 export const MOMENT_PROMOTION_COLLAPSED_ATTRIBUTE = 'data-bewly-moment-promotion-collapsed'
 
-// Short aliases keep the DOM contract easy to consume from a controller or stylesheet.
-export const PROMOTION_ACTIONS_CLASS = MOMENT_PROMOTION_ACTIONS_CLASS
-export const PROMOTION_BANNER_CLASS = MOMENT_PROMOTION_BANNER_CLASS
-export const PROMOTION_PANEL_CLASS = MOMENT_PROMOTION_PANEL_CLASS
-export const PROMOTION_COLLAPSED_CLASS = MOMENT_PROMOTION_COLLAPSED_CLASS
-export const PROMOTION_COLLAPSED_ATTRIBUTE = MOMENT_PROMOTION_COLLAPSED_ATTRIBUTE
-
 export interface MomentPromotionActionLabels {
   suspected: string
   confirmed: string
@@ -342,7 +335,3 @@ export function createMomentPromotionActionManager(
 
   return { ensure, remove, cleanup: () => entries.forEach((_entry, card) => remove(card)) }
 }
-
-export const createPromotionActionsManager = createMomentPromotionActionManager
-export type PromotionActionLabels = MomentPromotionActionLabels
-export type PromotionActionsManager = MomentPromotionActionManager
